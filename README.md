@@ -79,3 +79,7 @@ RPiP9 is under the New BSD License (BSD-3-Clause).
 
 # 7. Documentation
 Run an example and read it.
+
+![RaspberryPi3B01](./images/RaspberryPi3B01.jpg)
+
+![RaspberryPi3B02](./images/RaspberryPi3B02.jpg)
