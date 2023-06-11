@@ -1,0 +1,4 @@
+#https://pypi.org/project/netifaces/
+netifaces==0.11.0
+RPi.GPIO==0.7.1
+
