@@ -1,4 +1,5 @@
 #https://pypi.org/project/netifaces/
 netifaces==0.11.0
 RPi.GPIO==0.7.1
-
+pigpio==1.78
+#gpiozero=1.6.2

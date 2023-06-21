@@ -21,6 +21,8 @@ from pythonX9 import *
 import RPi.GPIO as GPIO
 import pigpio # PWM HW
 
+#from gpiozero import *
+
 TONES = { "DO": 262, "DO#": 277, "RE": 294, "RE#": 311, "MI": 330, "FA": 349, "FA#": 370, "SO": 392, "SO#": 415, "LA": 440, "LA#": 466, "SI": 494, "DO2": 523 }
 
 class rpip9gpio(pythonX9):
@@ -28,6 +30,7 @@ class rpip9gpio(pythonX9):
 	CONTROL_NORMAL=0
 	CONTROL_SW=1
 	CONTROL_HW=2
+	CONTROL_SERVO=3
 
 	def setGPIO(self, key, bcmid):
 		if ( self.gpioXlnk == 0 ):
@@ -45,17 +48,22 @@ class rpip9gpio(pythonX9):
 
 			for key, gpioX in self.gpioXlist.items():
 				if ( gpioX["control"] == self.CONTROL_SW ):
-					DBG_IF_LN(self, "CONTROL_SW (key: {})".format(key) )
+					DBG_IF_LN(self, "CONTROL_SW (key: {}, bcmid: {}, direction: {})".format(key, gpioX["bcmid"], gpioX["direction"]) )
 					if ( gpioX["direction"] == GPIO.OUT ):
 						GPIO.setup( gpioX["bcmid"], gpioX["direction"], initial=GPIO.LOW )
 					else:
 						GPIO.setup( gpioX["bcmid"], gpioX["direction"])
 
 					gpioX["pwm"] = GPIO.PWM(gpioX["bcmid"], gpioX["freq"])
-					gpioX["pwm"].start(0)
+					dutyCycle = gpioX["def"]/gpioX["divisor"]
+					gpioX["pwm"].start( 0 )
+					DBG_DB_LN(self, "pwmAngle (SW) (key: {}, def: {}, dutyCycle: {})".format(key, gpioX["def"], dutyCycle))
+					gpioX["pwm"].ChangeDutyCycle(dutyCycle)
 				elif ( gpioX["control"] == self.CONTROL_HW ):
-					DBG_IF_LN(self, "CONTROL_HW (key: {})".format(key) )
+					DBG_IF_LN(self, "CONTROL_HW (key: {}, bcmid: {}, direction: {})".format(key, gpioX["bcmid"], gpioX["direction"]) )
 					gpioX["pwm"] = pigpio.pi()
+					DBG_DB_LN(self, "pwmAngle (HW) (key: {}, def: {})".format(key, gpioX["def"]))
+					gpioX["pwm"].hardware_PWM(gpioX["bcmid"], gpioX["freq"], gpioX["def"])
 				else:
 					DBG_IF_LN(self, "call GPIO.setup - CONTROL_NORMAL ... (key: {}, bcmid: {}, direction: {})".format(key, gpioX["bcmid"], gpioX["direction"]) )
 					if ( gpioX["direction"] == GPIO.OUT ):
@@ -77,7 +85,7 @@ class rpip9gpio(pythonX9):
 		gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None):
 			if ( gpioX["control"] == self.CONTROL_SW ):
-					DBG_DB_LN(self, "pwmPower (SW)", "(key: {}, power: {})".format(key, power))
+					DBG_DB_LN(self, "pwmPower (SW) (key: {}, power: {})".format(key, power))
 					gpioX["pwm"].ChangeDutyCycle(power)
 
 	def pwmAngle(self, key, angle):
@@ -85,12 +93,13 @@ class rpip9gpio(pythonX9):
 		gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None):
 			if ( gpioX["control"] == self.CONTROL_SW ):
-				DBG_DB_LN(self, "pwmAngle (SW)", "(key: {}, angle: {})".format(key, angle))
-				dutyCycle = angle / 18. + 3.
+				DBG_DB_LN(self, "pwmAngle (SW) (key: {}, angle: {})".format(key, angle))
+				#dutyCycle = angle / 18. + 3.
+				dutyCycle = angle/gpioX["divisor"]
 				gpioX["pwm"].ChangeDutyCycle(dutyCycle)
 			elif ( gpioX["control"] == self.CONTROL_HW ):
-				DBG_DB_LN(self, "pwmAngle (HW)", "(key: {}, angle: {})".format(key, angle))
-				dutyCycle = int(500 * gpioX["freq"] + (1900 * gpioX["freq"] * angle / 180))
+				dutyCycle = angle
+				DBG_DB_LN(self, "pwmAngle (HW) (key: {}, angle: {}, dutyCycle: {})".format(key, angle, dutyCycle))
 				gpioX["pwm"].hardware_PWM(gpioX["bcmid"], gpioX["freq"], dutyCycle)
 
 	def gpioGetVal(self, gpioX):
@@ -145,6 +154,7 @@ class rpip9gpio(pythonX9):
 		if ( self.is_quit == 0 ):
 			self.is_quit = 1
 			if ( self.gpioXlnk == 1 ):
+				DBG_IF_LN("call GPIO.cleanup ...")
 				GPIO.cleanup()
 
 	def rpip9gpio_init(self):
