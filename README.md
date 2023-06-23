@@ -79,7 +79,55 @@ PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./servo_tilt_123.py -d 3
 
 ```
 
+#### - servo_tilt_pan_123.py : [SG90](https://datasheetspdf.com/pdf/791970/TowerPro/SG90/1)(180 degree Rotation)*2
 
+![servoSG9003](./images/servoSG9003.jpg)
+
+```mermaid
+flowchart LR
+	subgraph "ultrasonic (tilt)"
+		PWM_tilt["PWM (Orange)"]
+		VCC_tilt["VCC (Red)"]
+		GND_tilt["GND (Brown)"]
+	end
+	subgraph "ultrasonic (pan)"
+		PWM_pan["PWM (Orange)"]
+		VCC_pan["VCC (Red)"]
+		GND_pan["GND (Brown)"]
+	end
+	subgraph "Raspberry Pi"
+		BCM12[BCM 12]
+		BCM13[BCM 13]
+	end
+	BCM12 <--> PWM_tilt
+	BCM13 <--> PWM_pan
+```
+
+```bash
+$ make servo_tilt_pan_123.py
+----->> layer_python - /work/codebase/lankahsu520/RPiP9/python
+
+
+----->> run servo_tilt_pan_123.py
+PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./servo_tilt_pan_123.py -d 3
+[9036/0000] servo_api.py|threadx_handler:0116 - looping (name: tilt) ...
+[9036/0000] servo_api.py|threadx_handler:0116 - looping (name: pan) ...
+[9036/-001] rpip9gpio.py|linkGPIO:0044 - call GPIO.setmode ... (gpioXmode: 11)
+[9036/-001] rpip9gpio.py|linkGPIO:0050 - CONTROL_SW (key: tilt, bcmid: 12, direction: 0)
+[9036/-001] rpip9gpio.py|linkGPIO:0050 - CONTROL_SW (key: pan, bcmid: 13, direction: 0)
+[9036/-001] servo_api.py|keyboard_recv:0139 - press q to quit the loop (a: all, z:tilt, x:pan, ←:left, ↑:up, →:right, ↓:down, enter: default) ...
+[9036/-001] servo_api.py|servo_angle_helper:0057 - (key: tilt, val: 250 <= 760 <= 1250)
+[9036/-001] servo_api.py|servo_angle_helper:0057 - (key: tilt, val: 250 <= 770 <= 1250)
+[9036/-001] servo_api.py|servo_angle_helper:0057 - (key: pan, val: 250 <= 760 <= 1250)
+[9036/-001] servo_api.py|servo_angle_helper:0057 - (key: pan, val: 250 <= 770 <= 1250)
+[9036/-001] servo_api.py|servo_angle_helper:0057 - (key: pan, val: 250 <= 780 <= 1250)
+[9036/-001] servo_api.py|release:0168 - (is_quit: 0, gpioXlnk: 1)
+[9036/-001] servo_api.py|threadx_handler:0123 - Bye-Bye !!! (name: tilt)
+[9036/-001] servo_api.py|threadx_handler:0123 - Bye-Bye !!! (name: pan)
+[9036/-001] servo_api.py|release:0184 - call GPIO.cleanup ...
+[9036/-001] servo_tilt_pan_123.py|main:0126 - Bye-Bye !!! (is_quit: 1)
+
+```
 
 #### - ultrasonic_123.py : ultrasonic example
 

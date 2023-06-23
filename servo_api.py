@@ -48,13 +48,13 @@ class servo_ctx(rpip9gpio):
 		if (gpioX is not None):
 			if ( angle > gpioX["max"] ):
 				angle = gpioX["max"]
-				DBG_WN_LN(self, "(key: {}, angle: {} > max_angle: {} )".format(key, angle, gpioX["max"]) )
+				DBG_WN_LN(self, "(key: {}, angle: {} > max: {} )".format(key, angle, gpioX["max"]) )
 			if ( angle < gpioX["min"]  ):
 				angle = gpioX["min"]
-				DBG_WN_LN(self, "(key: {}, angle: {} < min_angle: {} )".format(key, angle, gpioX["min"]) )
+				DBG_WN_LN(self, "(key: {}, angle: {} < min: {} )".format(key, angle, gpioX["min"]) )
 			gpioX["val"] = angle
 
-			DBG_IF_LN(self, "(key: {}, min_angle: {}, val: {}, max_angle: {})".format( key, gpioX["min"], gpioX["val"], gpioX["max"] ) )
+			DBG_IF_LN(self, "(key: {}, val: {} <= {} <= {})".format( key, gpioX["min"], gpioX["val"], gpioX["max"] ) )
 			self.pwmAngle(key, gpioX["val"] )
 
 	def servo_angle_def(self, key):
@@ -135,12 +135,6 @@ class servo_ctx(rpip9gpio):
 		gpioX["cruise_cond"].release()
 		#DBG_IF_LN(self, "exit")
 
-	def start(self, args={"keyboard": 0}):
-		self.linkGPIO()
-		self.parse_args(args)
-		if (self.keyboard==1):
-			self.keyboard_recv()
-
 	def keyboard_recv(self):
 		DBG_WN_LN(self, "press q to quit the loop (a: all, z:tilt, x:pan, ←:left, ↑:up, →:right, ↓:down, enter: default) ...")
 		k='\x00'
@@ -177,6 +171,8 @@ class servo_ctx(rpip9gpio):
 			for key, gpioX in self.gpioXlist.items():
 				if (gpioX["direction"] == GPIO.OUT ):
 					self.wakeup(gpioX)
+					if (gpioX["threading"] is not None):
+						gpioX["threading"].join()
 
 			if ( self.gpioXlnk == 1 ):
 				for key, gpioX in self.gpioXlist.items():
@@ -184,7 +180,7 @@ class servo_ctx(rpip9gpio):
 						gpioX["pwm"].stop()
 					elif ( gpioX["control"] == self.CONTROL_HW ):
 						gpioX["pwm"].set_mode(gpioX["bcmid"], pigpio.INPUT)
-					gpioX["threading"].join()
+
 				DBG_WN_LN("call GPIO.cleanup ...")
 				GPIO.cleanup()
 
@@ -192,7 +188,7 @@ class servo_ctx(rpip9gpio):
 	def ctx_init(self, servo_gpio):
 		self.gpioXlist = servo_gpio
 
-		self.hold_sec = 1
+		self.hold_sec = 0.01
 
 		for key, gpioX in self.gpioXlist.items():
 			#DBG_WR_LN(self, "(key: {})".format(key) )
@@ -218,3 +214,8 @@ class servo_ctx(rpip9gpio):
 		self.keyboard = args["keyboard"]
 		DBG_TR_LN("(keyboard: {})".format( self.keyboard ));
 
+	def start(self, args={"keyboard": 0}):
+		self.linkGPIO()
+		self.parse_args(args)
+		if (self.keyboard==1):
+			self.keyboard_recv()
