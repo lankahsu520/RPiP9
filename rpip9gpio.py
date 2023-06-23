@@ -30,7 +30,6 @@ class rpip9gpio(pythonX9):
 	CONTROL_NORMAL=0
 	CONTROL_SW=1
 	CONTROL_HW=2
-	CONTROL_SERVO=3
 
 	def setGPIO(self, key, bcmid):
 		if ( self.gpioXlnk == 0 ):
