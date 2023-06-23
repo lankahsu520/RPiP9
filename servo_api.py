@@ -139,9 +139,7 @@ class servo_ctx(rpip9gpio):
 			self.keyboard_recv()
 
 	def keyboard_recv(self):
-		#self.servo_angle_def("tilt")
-		#self.servo_angle_def("pan")
-		DBG_IF_LN(self, "press q to quit the loop (z:tilt, x:pan, ←:left, ↑:up, →:right, ↓:down) ...")
+		DBG_IF_LN(self, "press q to quit the loop (z:tilt, x:pan, ←:left, ↑:up, →:right, ↓:down, enter: default) ...")
 		k='\x00'
 		while ( self.is_quit == 0 ):
 			k = self.inkey()

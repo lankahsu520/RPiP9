@@ -19,7 +19,7 @@ GITHUB_LIBS = \
 
 #** PYTHON_FILES **
 PYTHON_FILES = \
-							servo_123.py \
+							servo_tilt_123.py \
 							ultrasonic_123.py \
 
 DEBUG=3
