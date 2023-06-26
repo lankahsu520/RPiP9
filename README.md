@@ -25,7 +25,7 @@ Do nothing
 ```
 # 5. Example or Usage
 
-#### - servo_tilt_123.py : [SG90](https://datasheetspdf.com/pdf/791970/TowerPro/SG90/1)(180 degree Rotation) servo motor example
+#### - servo_tilt_123.py : [SG90](https://datasheetspdf.com/pdf/791970/TowerPro/SG90/1) (180 degree Rotation), Micro Servo example
 
 > a frequency of 50Hz. That frequency was selected because the servo motor expect a pulse every 20ms (period), that means 50 pulses per second or Hertz.
 
@@ -79,7 +79,7 @@ PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./servo_tilt_123.py -d 3
 
 ```
 
-#### - servo_tilt_pan_123.py : [SG90](https://datasheetspdf.com/pdf/791970/TowerPro/SG90/1)(180 degree Rotation)*2
+#### - servo_tilt_pan_123.py : [SG90 ](https://datasheetspdf.com/pdf/791970/TowerPro/SG90/1)(180 degree Rotation)*2, Micro Servo example
 
 ![servoSG9003](./images/servoSG9003.jpg)
 
@@ -129,7 +129,7 @@ PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./servo_tilt_pan_123.py -d 3
 
 ```
 
-#### - ultrasonic_123.py : ultrasonic example
+#### - ultrasonic_123.py : [HC-SR04](https://datasheetspdf.com/pdf/1380138/ETC1/HC-SR04/1), Ultrasonic Sensor example
 
 ![ultrasonic01](./images/ultrasonic01.jpg)
 

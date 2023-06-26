@@ -19,30 +19,31 @@
 from rpip9gpio import *
 #from threadx_api import *
 import threading
-from _thread import start_new_thread
+#from _thread import start_new_thread
 
 BCM_TILT=12#32
 BCM_PAN=13#33
 
-sw_tilt_330 = {"name": "tilt", "bcmid": BCM_TILT, "control": rpip9gpio.CONTROL_SW, "direction": GPIO.OUT, "val": 50, "def": 50, "freq": 330, "pwm": None, "max": 100, "min": 0, "step": 1, "cruise": 0, "threading": None, "cruise_cond": None, "divisor": 1}
-sw_pan_330 = {"name": "pan", "bcmid": BCM_PAN, "control": rpip9gpio.CONTROL_SW, "direction": GPIO.OUT, "val": 50, "def": 50, "freq": 330, "pwm": None, "max": 100, "min": 0, "step": 1, "cruise": 0, "threading": None, "cruise_cond": None, "divisor": 1}
+sw_tilt_330 = {"name": "tilt", "bcmid": BCM_TILT, "control": rpip9gpio.CONTROL_SW, "direction": GPIO.OUT, "val": 50, "def": 50, "freq": 330, "pwm": None, "max": 100, "min": 0, "step": 1, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 1}
+sw_pan_330 = {"name": "pan", "bcmid": BCM_PAN, "control": rpip9gpio.CONTROL_SW, "direction": GPIO.OUT, "val": 50, "def": 50, "freq": 330, "pwm": None, "max": 100, "min": 0, "step": 1, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 1}
 
 servo_sw_tilt_330 = {"tilt": sw_tilt_330}
 servo_sw_tilt_pan_330 = {"tilt": sw_tilt_330, "pan": sw_pan_330}
 
-sw_tilt_50 = {"name": "tilt", "bcmid": BCM_TILT, "control": rpip9gpio.CONTROL_SW, "direction": GPIO.OUT, "val": 750, "def": 750, "freq": 50, "pwm": None, "max": 1250, "min": 250, "step": 10, "cruise": 0, "threading": None, "cruise_cond": None, "divisor": 100}
-sw_pan_50 = {"name": "pan", "bcmid": BCM_PAN, "control": rpip9gpio.CONTROL_SW, "direction": GPIO.OUT, "val": 750, "def": 750, "freq": 50, "pwm": None, "max": 1250, "min": 250, "step": 10, "cruise": 0, "threading": None, "cruise_cond": None, "divisor": 100}
+sw_tilt_50 = {"name": "tilt", "bcmid": BCM_TILT, "control": rpip9gpio.CONTROL_SW, "direction": GPIO.OUT, "val": 750, "def": 750, "freq": 50, "pwm": None, "max": 1250, "min": 250, "step": 10, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 100}
+sw_pan_50 = {"name": "pan", "bcmid": BCM_PAN, "control": rpip9gpio.CONTROL_SW, "direction": GPIO.OUT, "val": 750, "def": 750, "freq": 50, "pwm": None, "max": 1250, "min": 250, "step": 10, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 100}
 
 servo_sw_tilt_50 = {"tilt": sw_tilt_50}
 servo_sw_tilt_pan_50 = {"tilt": sw_tilt_50, "pan": sw_pan_50}
 
-hw_tilt = {"name": "tilt", "bcmid": BCM_TILT, "control": rpip9gpio.CONTROL_HW, "direction": GPIO.OUT, "val": 72500, "def": 72500, "freq": 50, "pwm": None, "max": 120000, "min": 25000, "step": 950, "cruise": 0, "threading": None, "cruise_cond": None, "divisor": 1}
-hw_pan = {"name": "pan", "bcmid": BCM_PAN, "control": rpip9gpio.CONTROL_HW, "direction": GPIO.OUT, "val": 72500, "def": 72500, "freq": 50, "pwm": None, "max": 120000, "min": 25000, "step": 950, "cruise": 0, "threading": None, "cruise_cond": None, "divisor": 1}
+hw_tilt = {"name": "tilt", "bcmid": BCM_TILT, "control": rpip9gpio.CONTROL_HW, "direction": GPIO.OUT, "val": 72500, "def": 72500, "freq": 50, "pwm": None, "max": 120000, "min": 25000, "step": 950, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 1}
+hw_pan = {"name": "pan", "bcmid": BCM_PAN, "control": rpip9gpio.CONTROL_HW, "direction": GPIO.OUT, "val": 72500, "def": 72500, "freq": 50, "pwm": None, "max": 120000, "min": 25000, "step": 950, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 1}
 
 servo_hw_tilt_and_pan = {"tilt": hw_tilt, "pan": hw_pan}
 servo_hw_tilt = {"tilt": hw_tilt}
 
 class servo_ctx(rpip9gpio):
+
 	def servo_angle_helper(self, key, angle):
 		gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None):
@@ -60,21 +61,21 @@ class servo_ctx(rpip9gpio):
 	def servo_angle_def(self, key):
 		gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None):
-			self.servo_stop(key)
+			self.threadx_pause(gpioX)
 			DBG_IF_LN(self, "(val: {}, def: {}, step: {})".format(gpioX["val"], gpioX["def"], gpioX["step"] ))
 			self.servo_angle_helper(key, gpioX["def"] )
 
 	def servo_angle_inc(self, key):
 		gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None):
-			self.servo_stop(key)
+			self.threadx_pause(gpioX)
 			#DBG_DB_LN(self, "(val: {}, step: {})".format(gpioX["val"], gpioX["step"] ))
 			self.servo_angle_helper(key, gpioX["val"] + gpioX["step"] )
 
 	def servo_angle_dec(self, key):
 		gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None):
-			self.servo_stop(key)
+			self.threadx_pause(gpioX)
 			self.servo_angle_helper(key, gpioX["val"] - gpioX["step"] )
 
 	def servo_move(self, gpioX):
@@ -82,57 +83,70 @@ class servo_ctx(rpip9gpio):
 			angle_old = gpioX["val"]
 			key = gpioX["name"]
 			for i in range (angle_old, gpioX["max"]+1, gpioX["step"]):
-				if ( self.is_quit == 0 ) and ( gpioX["cruise"] == 1 ):
+				if ( self.is_quit == 0 ) and ( gpioX["threading_pause"] == 0 ):
 					self.servo_angle_helper(key, i)
 					sleep(self.hold_sec)
 			for i in range (gpioX["max"], gpioX["min"]+1, -gpioX["step"]):
-				if ( self.is_quit == 0 ) and ( gpioX["cruise"]  == 1 ):
+				if ( self.is_quit == 0 ) and ( gpioX["threading_pause"]  == 0 ):
 					self.servo_angle_helper(key, i)
 					sleep(self.hold_sec)
 			for i in range (gpioX["min"], angle_old+1, gpioX["step"]):
-				if ( self.is_quit == 0 ) and ( gpioX["cruise"]  == 1 ):
+				if ( self.is_quit == 0 ) and ( gpioX["threading_pause"]  == 0 ):
 					self.servo_angle_helper(key, i)
 					sleep(self.hold_sec)
-
-	def servo_stop(self, key):
-		gpioX = self.gpioXlist.get(key)
-		if (gpioX is not None):
-			gpioX["cruise"] = 0
-
-	def servo_stop_all(self):
-		for key, gpioX in self.gpioXlist.items():
-			gpioX["cruise"] = 0
 
 	def servo_start(self, key):
 		gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None):
-			if ( gpioX["cruise"] == 0):
-				gpioX["cruise"] = 1
-				self.wakeup(gpioX)
-			else:
-				gpioX["cruise"] = 0
+			self.threadx_run_loop(gpioX)
+
+	def threadx_pause(self, gpioX):
+		#gpioX = self.gpioXlist.get(key)
+		if (gpioX is not None):
+			gpioX["threading_pause"] = 1
+
+	def threadx_pause_all(self):
+		for key, gpioX in self.gpioXlist.items():
+			if ("threading_handler" in gpioX) and (gpioX["threading_handler"] is not None):
+				self.threadx_pause(gpioX)
+
+	def threadx_run_loop(self, gpioX):
+		#gpioX = self.gpioXlist.get(key)
+		if (gpioX is not None):
+			gpioX["threading_pause"] = 0
+			DBG_WN_LN(self, "run in loop ... ({}: {})".format( gpioX["name"], gpioX["bcmid"]) )
+			self.cond_wakeup(gpioX)
+
+	def threadx_run_all(self):
+		for key, gpioX in self.gpioXlist.items():
+			if ("threading_handler" in gpioX) and (gpioX["threading_handler"] is not None):
+				self.threadx_run_loop(gpioX)
+
+	def threadx_tick(self, gpioX):
+		self.servo_move(gpioX)
 
 	def threadx_handler(self, gpioX):
-		DBG_WN_LN(self, "looping (name: {}) ...".format(gpioX["name"]))
-		while (self.is_quit == 0):
-			if (gpioX["cruise"] == 0):
-				self.servo_sleep(gpioX)
-			else:
-				self.servo_move(gpioX)
-			#sleep(self.hold_sec)
-		DBG_WN_LN(self, "{} (name: {}) ".format(DBG_TXT_BYE_BYE, gpioX["name"]))
+		DBG_WN_LN(self, "looping ({}: {}) ...".format(gpioX["name"], gpioX["bcmid"]))
+		if (gpioX is not None):
+			while (self.is_quit == 0):
+				if (gpioX["threading_pause"] == 1):
+					self.cond_sleep(gpioX)
+				else:
+					self.threadx_tick(gpioX)
+				#sleep(self.hold_sec)
+		DBG_WN_LN(self, "{} ({}: {})".format(DBG_TXT_BYE_BYE, gpioX["name"], gpioX["bcmid"]))
 
-	def wakeup(self, gpioX):
-		gpioX["cruise_cond"].acquire()
+	def cond_wakeup(self, gpioX):
+		gpioX["threading_cond"].acquire()
 		#DBG_IF_LN(self, "notify ...")
-		gpioX["cruise_cond"].notify()
-		gpioX["cruise_cond"].release()
+		gpioX["threading_cond"].notify()
+		gpioX["threading_cond"].release()
 
-	def servo_sleep(self, gpioX):
-		gpioX["cruise_cond"].acquire()
+	def cond_sleep(self, gpioX):
+		gpioX["threading_cond"].acquire()
 		#DBG_IF_LN(self, "wait ...")
-		gpioX["cruise_cond"].wait()
-		gpioX["cruise_cond"].release()
+		gpioX["threading_cond"].wait()
+		gpioX["threading_cond"].release()
 		#DBG_IF_LN(self, "exit")
 
 	def keyboard_recv(self):
@@ -140,8 +154,10 @@ class servo_ctx(rpip9gpio):
 		k='\x00'
 		while ( self.is_quit == 0 ):
 			k = self.inkey()
-			self.servo_stop_all()
-			if k=='\x41': # up
+			self.threadx_pause_all()
+			if k=='\x71': # q
+				break;
+			elif k=='\x41': # up
 				self.servo_angle_inc("tilt")
 			elif k=='\x42': # down
 				self.servo_angle_dec("tilt")
@@ -153,14 +169,11 @@ class servo_ctx(rpip9gpio):
 				self.servo_angle_def("tilt")
 				self.servo_angle_def("pan")
 			elif k=='\x61': # a
-				self.servo_start("tilt")
-				self.servo_start("pan")
+				self.threadx_run_all()
 			elif k=='\x7a': # z
 				self.servo_start("tilt")
 			elif k=='\x78': # x
 				self.servo_start("pan")
-			elif k=='\x71': # q
-				break;
 			elif k=='\x03':
 				break;
 
@@ -169,10 +182,9 @@ class servo_ctx(rpip9gpio):
 		if ( self.is_quit == 0 ):
 			self.is_quit = 1
 			for key, gpioX in self.gpioXlist.items():
-				if (gpioX["direction"] == GPIO.OUT ):
-					self.wakeup(gpioX)
-					if (gpioX["threading"] is not None):
-						gpioX["threading"].join()
+				if (gpioX["threading_handler"] is not None):
+					self.cond_wakeup(gpioX)
+					gpioX["threading_handler"].join()
 
 			if ( self.gpioXlnk == 1 ):
 				for key, gpioX in self.gpioXlist.items():
@@ -184,7 +196,6 @@ class servo_ctx(rpip9gpio):
 				DBG_WN_LN("call GPIO.cleanup ...")
 				GPIO.cleanup()
 
-
 	def ctx_init(self, servo_gpio):
 		self.gpioXlist = servo_gpio
 
@@ -192,10 +203,10 @@ class servo_ctx(rpip9gpio):
 
 		for key, gpioX in self.gpioXlist.items():
 			#DBG_WR_LN(self, "(key: {})".format(key) )
-			if (gpioX["direction"] == GPIO.OUT ):
-				gpioX["cruise_cond"] = threading.Condition()
-				gpioX["threading"] = threading.Thread(target=self.threadx_handler, args = (gpioX, ))
-				gpioX["threading"].start()
+			if (gpioX["threading_handler"] is None):
+				gpioX["threading_cond"] = threading.Condition()
+				gpioX["threading_handler"] = threading.Thread(target=self.threadx_handler, args = (gpioX, ))
+				gpioX["threading_handler"].start()
 
 		sleep(0.5)
 
