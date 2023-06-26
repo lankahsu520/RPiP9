@@ -139,6 +139,30 @@ PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./servo_tilt_pan_123.py -d 3
 
 ```
 
+#### - xtrack_18_123.py : Tracker Sensor (TCRT5000), Tracker Sensor example
+
+![tracker001](./images/tracker001.jpg)
+```mermaid
+flowchart LR
+	subgraph "tracker"
+		OUT["OUT"]
+		VCC["VCC"]
+		GND["GND"]
+	end
+	subgraph "Raspberry Pi"
+		BCM18[BCM 18]
+		5V_PI[5V]
+		GND_PI[GND]
+	end
+	BCM18 <--> OUT
+	5V_PI <--> VCC
+	GND_PI <--> GND
+
+```
+
+
+
+
 #### - ultrasonic_123.py : [HC-SR04](https://datasheetspdf.com/pdf/1380138/ETC1/HC-SR04/1), Ultrasonic Sensor example
 
 ![ultrasonic01](./images/ultrasonic01.jpg)
