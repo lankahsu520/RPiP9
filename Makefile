@@ -19,6 +19,8 @@ GITHUB_LIBS = \
 
 #** PYTHON_FILES **
 PYTHON_FILES = \
+							xtrack_all_456.py \
+							xtrack_18_123.py \
 							servo_tilt_pan_123.py \
 							servo_tilt_123.py \
 							ultrasonic_123.py \

@@ -64,11 +64,12 @@ class rpip9gpio(pythonX9):
 					DBG_DB_LN(self, "pwmAngle (HW) (key: {}, def: {})".format(key, gpioX["def"]))
 					gpioX["pwm"].hardware_PWM(gpioX["bcmid"], gpioX["freq"], gpioX["def"])
 				else:
-					DBG_IF_LN(self, "call GPIO.setup - CONTROL_NORMAL ... (key: {}, bcmid: {}, direction: {})".format(key, gpioX["bcmid"], gpioX["direction"]) )
+					DBG_IF_LN(self, "CONTROL_NORMAL ... (key: {}, bcmid: {}, direction: {})".format(key, gpioX["bcmid"], gpioX["direction"]) )
 					if ( gpioX["direction"] == GPIO.OUT ):
 						GPIO.setup( gpioX["bcmid"], gpioX["direction"], initial=GPIO.LOW )
 					else:
 						GPIO.setup( gpioX["bcmid"], gpioX["direction"])
+						#GPIO.setup( gpioX["bcmid"], gpioX["direction"], pull_up_down=GPIO.PUD_UP)
 						#GPIO.setup( gpioX["bcmid"], gpioX["direction"], pull_up_down=GPIO.PUD_DOWN)
 
 	def pwmFreq(self, key, freq):

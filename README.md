@@ -41,8 +41,12 @@ flowchart LR
 	end
 	subgraph "Raspberry Pi"
     BCM12[BCM 12]
-	end
+    5V_PI[5V]
+    GND_PI[GND]
+  end
 	BCM12 <--> PWM
+	5V_PI <--> VCC
+	GND_PI <--> GND
 ```
 
 | api         | Codes                                                        | freq | min                       | max                        | step |
@@ -98,9 +102,15 @@ flowchart LR
 	subgraph "Raspberry Pi"
 		BCM12[BCM 12]
 		BCM13[BCM 13]
+		5V_PI[5V]
+		GND_PI[GND]
 	end
 	BCM12 <--> PWM_tilt
 	BCM13 <--> PWM_pan
+	5V_PI <--> VCC_tilt
+	5V_PI <--> VCC_pan
+	GND_PI <--> GND_tilt
+	GND_PI <--> GND_pan
 ```
 
 ```bash
@@ -136,17 +146,21 @@ PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./servo_tilt_pan_123.py -d 3
 ```mermaid
 flowchart LR
 	subgraph ultrasonic
-    VCC[VCC]
-    Trigger[Trigger]
-    Echo[Echo]
+		VCC[VCC]
+		Trigger[Trigger]
+		Echo[Echo]
 		GND[GND]
 	end
 	subgraph "Raspberry Pi"
-    BCM5[BCM 5]
-    BCM6[BCM 6]
+		BCM5[BCM 5]
+		BCM6[BCM 6]
+		5V_PI[5V]
+		GND_PI[GND]
 	end
 	BCM5 <--> Trigger
 	BCM6 <--> Echo
+	5V_PI <--> VCC
+	GND_PI <--> GND
 ```
 
 ```bash
