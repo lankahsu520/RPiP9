@@ -201,7 +201,7 @@ class xtrack_ctx(rpip9gpio):
 
 		for key, gpioX in self.gpioXlist.items():
 			if ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio.EDGE_EVENT):
-				DBG_IF_LN("call add_event_detect ...")
+				DBG_IF_LN("call add_event_detect .. ({}:{}, bcmid:{}).".format(gpioX["name"], gpioX["val"], gpioX["bcmid"]))
 				GPIO.add_event_detect(gpioX["bcmid"], GPIO.BOTH, callback=self.edge_detect_cb)
 
 		if (self.keyboard==1):
