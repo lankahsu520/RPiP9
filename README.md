@@ -11,12 +11,8 @@ RPiP9 把 Raspberry Pi 上常見的模組搜集而成。
 # 2. Depend on
 
 - [netifaces (0.11.0)](https://pypi.org/project/netifaces/)
-
 - [RPi.GPIO (0.7.1)](https://pypi.org/project/RPi.GPIO/)
-
 - [pigpio (1.78)](https://pypi.org/project/pigpio/)
-
-- [micropython-max30102 (0.4.1)](https://pypi.org/project/micropython-max30102/)
 
 
 # 3. Current Status
