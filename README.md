@@ -108,10 +108,9 @@ flowchart LR
 	BCM12 <--> PWM_tilt
 	BCM13 <--> PWM_pan
 	5V_PI <--> VCC_tilt
-	5V_PI <--> VCC_pan
 	GND_PI <--> GND_tilt
-	GND_PI <--> GND_pan
 ```
+> This is just an illustration to avoid overly complex graphics. Please correctly connect VCC and GND.
 
 ```bash
 $ make servo_tilt_pan_123.py
@@ -190,6 +189,113 @@ PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./xtrack_18_123.py -d 3
 
 ```
 
+#### - xtrack_all_456.py : Tracker Sensor (TCRT5000)*5, Tracker Sensor example
+```mermaid
+flowchart TD
+	subgraph "r2"
+		OUT_r2["OUT"]
+		VCC_r2["VCC"]
+		GND_r2["GND"]
+	end
+	subgraph "r1"
+		OUT_r1["OUT"]
+		VCC_r1["VCC"]
+		GND_r1["GND"]
+	end
+	subgraph "m0"
+		OUT_m0["OUT"]
+		VCC_m0["VCC"]
+		GND_m0["GND"]
+	end
+	subgraph "l1"
+		OUT_l1["OUT"]
+		VCC_l1["VCC"]
+		GND_l1["GND"]
+	end
+	subgraph "l2"
+		OUT_l2["OUT"]
+		VCC_l2["VCC"]
+		GND_l2["GND"]
+	end
+	subgraph "Raspberry Pi"
+		BCM24[BCM 24]
+    BCM23[BCM 23]
+    BCM18[BCM 18]
+		BCM15[BCM 15]
+    BCM14[BCM 14]
+		5V_PI[5V]
+		GND_PI[GND]
+	end
+	BCM14 <--> OUT_r2
+
+	BCM15 <--> OUT_r1
+
+	BCM18 <--> OUT_m0
+	5V_PI <--> VCC_m0
+	GND_PI <--> GND_m0
+
+	BCM23 <--> OUT_l1
+
+	BCM24 <--> OUT_l2
+
+```
+> This is just an illustration to avoid overly complex graphics. Please correctly connect VCC and GND.
+
+```bash
+$ make xtrack_all_456.py
+----->> layer_python - /work/codebase/lankahsu520/RPiP9/python
+
+
+----->> run xtrack_all_456.py
+PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./xtrack_all_456.py -d 3
+[25239/1982067776] xtrack_api.py|threadx_handler:0110 - looping ... (l2: 0, bcmid:24)
+[25239/1982067776] xtrack_api.py|cond_sleep:0130 - wait ... (l2: 0, bcmid: 24)mid:23)
+
+[25239/1972368448] xtrack_api.py|cond_sleep:0130 - wait ... (l1: 0, bcmid: 23)
+[25239/1951396928] xtrack_api.py|threadx_handler:0110 - looping ... (r1: 0, bcmid:15)
+[25239/1951396928] xtrack_api.py|cond_sleep:0130 - wait ... (r1: 0, bcmid: 15)
+[25239/1961882688] xtrack_api.py|threadx_handler:0110 - looping ... (m0: 0, bcmid:18)
+[25239/1961882688] xtrack_api.py|cond_sleep:0130 - wait ... (m0: 0, bcmid: 18)
+[25239/1940911168] xtrack_api.py|threadx_handler:0110 - looping ... (r2: 0, bcmid:14)
+[25239/1940911168] xtrack_api.py|cond_sleep:0130 - wait ... (r2: 0, bcmid: 14)
+[25239/1996454720] rpip9gpio.py|linkGPIO:0050 - call GPIO.setmode ... (gpioXmode: 11)
+[25239/1996454720] rpip9gpio.py|linkGPIO:0073 - CONTROL_NORMAL ... (key: l2, bcmid: 24, direction: 1)
+[25239/1996454720] rpip9gpio.py|linkGPIO:0073 - CONTROL_NORMAL ... (key: l1, bcmid: 23, direction: 1)
+[25239/1996454720] rpip9gpio.py|linkGPIO:0073 - CONTROL_NORMAL ... (key: m0, bcmid: 18, direction: 1)
+[25239/1996454720] rpip9gpio.py|linkGPIO:0073 - CONTROL_NORMAL ... (key: r1, bcmid: 15, direction: 1)
+[25239/1996454720] rpip9gpio.py|linkGPIO:0073 - CONTROL_NORMAL ... (key: r2, bcmid: 14, direction: 1)
+[25239/1996454720] xtrack_api.py|start:0204 - call add_event_detect ...
+[25239/1996454720] xtrack_api.py|start:0204 - call add_event_detect ...
+[25239/1996454720] xtrack_api.py|start:0204 - call add_event_detect ...
+[25239/1996454720] xtrack_api.py|start:0204 - call add_event_detect ...
+[25239/1996454720] xtrack_api.py|start:0204 - call add_event_detect ...
+[25239/1996454720] xtrack_api.py|keyboard_recv:0136 - press q to quit the loop (enter: start, space: pause) ...
+[25239/1996454720] xtrack_api.py|threadx_run_loop:0093 - run in loop ... (l2: 0, bcmid: 24)
+[25239/1996454720] xtrack_api.py|threadx_run_loop:0093 - run in loop ... (l1: 0, bcmid: 23)
+[25239/1996454720] xtrack_api.py|threadx_run_loop:0093 - run in loop ... (m0: 0, bcmid: 18)
+[25239/1996454720] xtrack_api.py|threadx_run_loop:0093 - run in loop ... (r1: 0, bcmid: 15)
+[25239/1982067776] xtrack_api.py|cond_sleep:0130 - wait ... (l2: 0, bcmid: 24)
+[25239/1972368448] xtrack_api.py|cond_sleep:0130 - wait ... (l1: 0, bcmid: 23)
+[25239/1996454720] xtrack_api.py|threadx_run_loop:0093 - run in loop ... (r2: 0, bcmid: 14)
+[25239/1961882688] xtrack_api.py|cond_sleep:0130 - wait ... (m0: 0, bcmid: 18)
+[25239/1951396928] xtrack_api.py|cond_sleep:0130 - wait ... (r1: 0, bcmid: 15)
+[25239/1940911168] xtrack_api.py|cond_sleep:0130 - wait ... (r2: 0, bcmid: 14)
+[25239/1930425408] xtrack_api.py|edge_detect_cb:0077 - (m0: 1, bcmid: 18)
+[25239/1930425408] xtrack_api.py|edge_detect_cb:0077 - (m0: 0, bcmid: 18)
+[25239/1930425408] xtrack_api.py|edge_detect_cb:0077 - (m0: 1, bcmid: 18)
+[25239/1930425408] xtrack_api.py|edge_detect_cb:0077 - (m0: 0, bcmid: 18)
+[25239/1930425408] xtrack_api.py|edge_detect_cb:0077 - (m0: 1, bcmid: 18)
+[25239/1930425408] xtrack_api.py|edge_detect_cb:0077 - (m0: 0, bcmid: 18)
+[25239/1996454720] xtrack_api.py|release:0151 - (is_quit: 0, gpioXlnk: 1)
+[25239/1982067776] xtrack_api.py|threadx_handler:0118 - Bye-Bye !!! (l2: 0, bcmid:24)
+[25239/1972368448] xtrack_api.py|threadx_handler:0118 - Bye-Bye !!! (l1: 0, bcmid:23)
+[25239/1961882688] xtrack_api.py|threadx_handler:0118 - Bye-Bye !!! (m0: 0, bcmid:18)
+[25239/1951396928] xtrack_api.py|threadx_handler:0118 - Bye-Bye !!! (r1: 0, bcmid:15)
+[25239/1940911168] xtrack_api.py|threadx_handler:0118 - Bye-Bye !!! (r2: 0, bcmid:14)
+[25239/1996454720] xtrack_api.py|release:0164 - call GPIO.cleanup ...
+[25239/1996454720] xtrack_all_456.py|main:0120 - Bye-Bye !!! (is_quit: 1)
+
+```
 
 #### - ultrasonic_123.py : [HC-SR04](https://datasheetspdf.com/pdf/1380138/ETC1/HC-SR04/1), Ultrasonic Sensor example
 
