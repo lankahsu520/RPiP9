@@ -49,27 +49,27 @@ class servo_ctx(rpip9gpio):
 		if (gpioX is not None):
 			if ( angle > gpioX["max"] ):
 				angle = gpioX["max"]
-				DBG_WN_LN(self, "(key: {}, angle: {} > max: {} )".format(key, angle, gpioX["max"]) )
+				DBG_WN_LN(self, "(gpioX[{}/{}]: {} > max: {})".format( gpioX["name"], gpioX["bcmid"], angle, gpioX["max"]) )
 			if ( angle < gpioX["min"]  ):
 				angle = gpioX["min"]
-				DBG_WN_LN(self, "(key: {}, angle: {} < min: {} )".format(key, angle, gpioX["min"]) )
+				DBG_WN_LN(self, "(gpioX[{}/{}]: {} < min: {})".format( gpioX["name"], gpioX["bcmid"], angle, gpioX["min"]) )
 			gpioX["val"] = angle
 
-			DBG_IF_LN(self, "(key: {}, val: {} <= {} <= {})".format( key, gpioX["min"], gpioX["val"], gpioX["max"] ) )
+			DBG_IF_LN(self, "(gpioX[{}/{}]: {} <= {} <= {})".format( gpioX["name"], gpioX["bcmid"], gpioX["min"], gpioX["val"], gpioX["max"] ) )
 			self.pwmAngle(key, gpioX["val"] )
 
 	def servo_angle_def(self, key):
 		gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None):
 			self.threadx_pause(gpioX)
-			DBG_IF_LN(self, "(val: {}, def: {}, step: {})".format(gpioX["val"], gpioX["def"], gpioX["step"] ))
+			DBG_IF_LN(self, "(gpioX[{}/{}]: {}, def: {}, step: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"], gpioX["def"], gpioX["step"] ))
 			self.servo_angle_helper(key, gpioX["def"] )
 
 	def servo_angle_inc(self, key):
 		gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None):
 			self.threadx_pause(gpioX)
-			#DBG_DB_LN(self, "(val: {}, step: {})".format(gpioX["val"], gpioX["step"] ))
+			#DBG_DB_LN(self, "(gpioX[{}/{}]: {}, step: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"], gpioX["step"] ))
 			self.servo_angle_helper(key, gpioX["val"] + gpioX["step"] )
 
 	def servo_angle_dec(self, key):
@@ -114,7 +114,7 @@ class servo_ctx(rpip9gpio):
 		#gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None) and ("threading_pause" in gpioX):
 			gpioX["threading_pause"] = 0
-			DBG_WN_LN(self, "run in loop ... ({}: {}, bcmid: {})".format( gpioX["name"], gpioX["val"], gpioX["bcmid"]) )
+			DBG_WN_LN(self, "run in loop ... (gpioX[{}/{}]: {})".format( gpioX["name"], gpioX["bcmid"], gpioX["val"]) )
 			self.cond_wakeup(gpioX)
 
 	def threadx_run_all(self):
@@ -126,7 +126,7 @@ class servo_ctx(rpip9gpio):
 		self.servo_move(gpioX)
 
 	def threadx_handler(self, gpioX):
-		DBG_WN_LN(self, "looping ... ({}: {}, bcmid: {})".format(gpioX["name"], gpioX["val"], gpioX["bcmid"]))
+		DBG_WN_LN(self, "looping ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 		if (gpioX is not None):
 			while (self.is_quit == 0):
 				if ("threading_pause" in gpioX) and (gpioX["threading_pause"] == 1):
@@ -134,7 +134,7 @@ class servo_ctx(rpip9gpio):
 				else:
 					self.threadx_tick(gpioX)
 				#sleep(self.hold_sec)
-		DBG_WN_LN(self, "{} ({}: {}, bcmid: {}".format(DBG_TXT_BYE_BYE, gpioX["name"], gpioX["val"], gpioX["bcmid"]))
+		DBG_WN_LN(self, "{} (gpioX[{}/{}]: {})".format(DBG_TXT_BYE_BYE, gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 
 	def cond_wakeup(self, gpioX):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
@@ -146,7 +146,7 @@ class servo_ctx(rpip9gpio):
 	def cond_sleep(self, gpioX):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
 			gpioX["threading_cond"].acquire()
-			DBG_WN_LN(self, "wait ... ({}: {}, bcmid: {})".format(gpioX["name"], gpioX["val"], gpioX["bcmid"]))
+			DBG_WN_LN(self, "wait ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 			gpioX["threading_cond"].wait()
 			gpioX["threading_cond"].release()
 			#DBG_IF_LN(self, "exit")

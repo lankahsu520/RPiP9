@@ -26,16 +26,53 @@ import pigpio # PWM HW
 TONES = { "DO": 262, "DO#": 277, "RE": 294, "RE#": 311, "MI": 330, "FA": 349, "FA#": 370, "SO": 392, "SO#": 415, "LA": 440, "LA#": 466, "SI": 494, "DO2": 523 }
 
 class rpip9gpio(pythonX9):
+
+	#GPIO_MODE=GPIO.BOARD
 	GPIO_MODE=GPIO.BCM
+
+	def strgpio(self, gpio):
+		gpioX = {
+			GPIO.BCM: "GPIO.BCM",
+			GPIO.BOARD: "GPIO.BOARD"
+		}
+		result = gpioX.get(gpio, "GPIO.???")
+		return result
+
 	CONTROL_NORMAL=0
 	CONTROL_SW=1
 	CONTROL_HW=2
+
+	def strcontrol(self, control):
+		controlX = {
+			self.CONTROL_NORMAL: "CONTROL_NORMAL",
+			self.CONTROL_SW: "CONTROL_SW",
+			self.CONTROL_HW: "CONTROL_HW"
+		}
+		result = controlX.get(control, "CONTROL_???")
+		return result
 
 	# 0: busy loop, 1: wait_for_edge, 2: event_detect
 	EDGE_BUSY=0
 	EDGE_WAIT=1 # GPIO.wait_for_edge
 	EDGE_EVENT=2 # GPIO.add_event_detect
 	EDGE_DEFAULT=EDGE_EVENT
+
+	def stredge(self, edge):
+		edgeX = {
+			self.EDGE_BUSY: "EDGE_BUSY",
+			self.EDGE_WAIT: "EDGE_WAIT",
+			self.EDGE_EVENT: "EDGE_EVENT"
+		}
+		result = edgeX.get(edge, "EDGE_???")
+		return result
+
+	def strdirection(self, direction):
+		directionX = {
+			GPIO.IN: "GPIO.IN",
+			GPIO.OUT: "GPIO.OUT",
+		}
+		result = directionX.get(direction, "GPIO.???")
+		return result
 
 	def setGPIO(self, key, bcmid):
 		if ( self.gpioXlnk == 0 ):
@@ -47,13 +84,13 @@ class rpip9gpio(pythonX9):
 	def linkGPIO(self):
 		if ( self.gpioXlnk == 0 ):
 			self.gpioXlnk = 1
-			DBG_IF_LN(self, "call GPIO.setmode ... (gpioXmode: {})".format(self.gpioXmode) )
+			DBG_IF_LN(self, "call GPIO.setmode ... (gpioXmode: {})".format( self.strgpio(self.gpioXmode) ) )
 			GPIO.setmode(self.gpioXmode)
 			GPIO.setwarnings(False)
 
 			for key, gpioX in self.gpioXlist.items():
+				DBG_IF_LN(self, "{} (gpioX[{}/{}]: {}, direction: {})".format(self.strcontrol(gpioX["control"]), key, gpioX["bcmid"], gpioX["val"], self.strdirection(gpioX["direction"])) )
 				if ( gpioX["control"] == self.CONTROL_SW ):
-					DBG_IF_LN(self, "CONTROL_SW (key: {}, bcmid: {}, direction: {})".format(key, gpioX["bcmid"], gpioX["direction"]) )
 					if ( gpioX["direction"] == GPIO.OUT ):
 						GPIO.setup( gpioX["bcmid"], gpioX["direction"], initial=GPIO.LOW )
 					else:
@@ -65,12 +102,10 @@ class rpip9gpio(pythonX9):
 					DBG_DB_LN(self, "pwmAngle (SW) (key: {}, def: {}, dutyCycle: {})".format(key, gpioX["def"], dutyCycle))
 					gpioX["pwm"].ChangeDutyCycle(dutyCycle)
 				elif ( gpioX["control"] == self.CONTROL_HW ):
-					DBG_IF_LN(self, "CONTROL_HW (key: {}, bcmid: {}, direction: {})".format(key, gpioX["bcmid"], gpioX["direction"]) )
 					gpioX["pwm"] = pigpio.pi()
 					DBG_DB_LN(self, "pwmAngle (HW) (key: {}, def: {})".format(key, gpioX["def"]))
 					gpioX["pwm"].hardware_PWM(gpioX["bcmid"], gpioX["freq"], gpioX["def"])
 				else:
-					DBG_IF_LN(self, "CONTROL_NORMAL ... (key: {}, bcmid: {}, direction: {})".format(key, gpioX["bcmid"], gpioX["direction"]) )
 					if ( gpioX["direction"] == GPIO.OUT ):
 						GPIO.setup( gpioX["bcmid"], gpioX["direction"], initial=GPIO.LOW )
 					else:

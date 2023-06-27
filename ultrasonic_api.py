@@ -109,7 +109,7 @@ class ultrasonic_ctx(rpip9gpio):
 		#gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None) and ("threading_pause" in gpioX):
 			gpioX["threading_pause"] = 0
-			DBG_WN_LN(self, "run in loop ... ({}: {}, bcmid: {})".format( gpioX["name"], gpioX["val"], gpioX["bcmid"]) )
+			DBG_WN_LN(self, "run in loop ... (gpioX[{}/{}]: {})".format( gpioX["name"], gpioX["bcmid"], gpioX["val"]) )
 			self.cond_wakeup(gpioX)
 
 	def threadx_run_all(self):
@@ -134,7 +134,7 @@ class ultrasonic_ctx(rpip9gpio):
 		self.watch(gpioX_echo)
 
 	def threadx_handler(self, gpioX_trigger, gpioX_echo):
-		DBG_WN_LN(self, "looping ... ({}: {}, bcmid:{}, {}: {}, bcmid:{}, edge: {})".format(gpioX_trigger["name"], gpioX_trigger["val"], gpioX_trigger["bcmid"], gpioX_echo["name"], gpioX_echo["val"], gpioX_echo["bcmid"], gpioX_echo["edge"]))
+		DBG_WN_LN(self, "looping ... ({}: {}, bcmid:{}, {}: {}, bcmid:{}, edge: {})".format(gpioX_trigger["name"], gpioX_trigger["val"], gpioX_trigger["bcmid"], gpioX_echo["name"], gpioX_echo["val"], gpioX_echo["bcmid"], self.stredge(gpioX_echo["edge"])))
 		if (gpioX_trigger is not None) and (gpioX_echo is not None):
 			while (self.is_quit == 0):
 				if ("threading_pause" in gpioX_trigger) and (gpioX_trigger["threading_pause"] == 1):
@@ -154,7 +154,7 @@ class ultrasonic_ctx(rpip9gpio):
 	def cond_sleep(self, gpioX):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
 			gpioX["threading_cond"].acquire()
-			DBG_WN_LN(self, "wait ... ({}: {}, bcmid: {})".format(gpioX["name"], gpioX["val"], gpioX["bcmid"]))
+			DBG_WN_LN(self, "wait ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 			gpioX["threading_cond"].wait()
 			gpioX["threading_cond"].release()
 			#DBG_IF_LN(self, "exit")
@@ -234,7 +234,7 @@ class ultrasonic_ctx(rpip9gpio):
 
 		for key, gpioX in self.gpioXlist.items():
 			if ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio.EDGE_EVENT):
-				DBG_IF_LN("call add_event_detect .. ({}:{}, bcmid:{}).".format(gpioX["name"], gpioX["val"], gpioX["bcmid"]))
+				DBG_IF_LN("call add_event_detect .. (gpioX[{}/{}]: {}).".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 				GPIO.add_event_detect(gpioX["bcmid"], GPIO.BOTH, callback=self.edge_detect_cb)
 
 		if (self.keyboard==1):

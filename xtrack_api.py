@@ -67,14 +67,14 @@ class xtrack_ctx(rpip9gpio):
 
 			if (channel is not None):
 				gpioX["val"] = self.gpioGetVal(gpioX)
-				DBG_IF_LN(self, "({}: {}, bcmid: {})".format(gpioX["name"], gpioX["val"], gpioX["bcmid"]))
+				DBG_IF_LN(self, "(gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 
 	def edge_detect_cb(self, bcmid):
 		val = self.gpioGetValWithID(bcmid)
 		for key, gpioX in self.gpioXlist.items():
 			if (gpioX["bcmid"] == bcmid ):
 				gpioX["val"] = val
-				DBG_IF_LN(self, "({}: {}, bcmid: {})".format(gpioX["name"], gpioX["val"], gpioX["bcmid"]))
+				DBG_IF_LN(self, "(gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 
 	def threadx_pause(self, gpioX):
 		#gpioX = self.gpioXlist.get(key)
@@ -90,7 +90,7 @@ class xtrack_ctx(rpip9gpio):
 		#gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None) and ("threading_pause" in gpioX):
 			gpioX["threading_pause"] = 0
-			DBG_WN_LN(self, "run in loop ... ({}: {}, bcmid: {})".format( gpioX["name"], gpioX["val"], gpioX["bcmid"]) )
+			DBG_WN_LN(self, "run in loop ... (gpioX[{}/{}]: {})".format( gpioX["name"], gpioX["bcmid"], gpioX["val"]) )
 			self.cond_wakeup(gpioX)
 
 	def threadx_run_all(self):
@@ -107,7 +107,7 @@ class xtrack_ctx(rpip9gpio):
 			self.cond_sleep(gpioX)
 
 	def threadx_handler(self, gpioX):
-		DBG_WN_LN(self, "looping ... ({}: {}, bcmid:{})".format(gpioX["name"], gpioX["val"], gpioX["bcmid"]))
+		DBG_WN_LN(self, "looping ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 		if (gpioX is not None):
 			while (self.is_quit == 0):
 				if ("threading_pause" in gpioX) and (gpioX["threading_pause"] == 1):
@@ -115,7 +115,7 @@ class xtrack_ctx(rpip9gpio):
 				else:
 					self.threadx_tick(gpioX)
 				#sleep(self.hold_sec)
-		DBG_WN_LN(self, "{} ({}: {}, bcmid:{})".format(DBG_TXT_BYE_BYE, gpioX["name"], gpioX["val"], gpioX["bcmid"]))
+		DBG_WN_LN(self, "{} (gpioX[{}/{}]: {})".format(DBG_TXT_BYE_BYE, gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 
 	def cond_wakeup(self, gpioX):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
@@ -127,7 +127,7 @@ class xtrack_ctx(rpip9gpio):
 	def cond_sleep(self, gpioX):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
 			gpioX["threading_cond"].acquire()
-			DBG_WN_LN(self, "wait ... ({}: {}, bcmid: {})".format(gpioX["name"], gpioX["val"], gpioX["bcmid"]))
+			DBG_WN_LN(self, "wait ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 			gpioX["threading_cond"].wait()
 			gpioX["threading_cond"].release()
 			#DBG_IF_LN(self, "exit")
@@ -201,7 +201,7 @@ class xtrack_ctx(rpip9gpio):
 
 		for key, gpioX in self.gpioXlist.items():
 			if ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio.EDGE_EVENT):
-				DBG_IF_LN("call add_event_detect .. ({}:{}, bcmid:{}).".format(gpioX["name"], gpioX["val"], gpioX["bcmid"]))
+				DBG_IF_LN("call add_event_detect .. (gpioX[{}/{}]: {}).".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 				GPIO.add_event_detect(gpioX["bcmid"], GPIO.BOTH, callback=self.edge_detect_cb)
 
 		if (self.keyboard==1):
