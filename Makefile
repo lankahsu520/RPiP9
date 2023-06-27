@@ -53,11 +53,11 @@ layer_python:
 	@echo '----->> $@ - $(PWD)/python'
 	@if [ ! -d "$(PWD)/python" ]; then \
 		(pip3 install --target $(PWD)/python -r requirements.txt); \
-		for libs in $(GITHUB_LIBS); do (git clone $$libs github_libs && $(PJ_SH_CP) github_libs/*.py $(PWD)/python && rm -rf github_libs); done \
+		[ -d "$(PWD)/python" ] && (for libs in $(GITHUB_LIBS); do (git clone $$libs github_libs && $(PJ_SH_CP) github_libs/*.py $(PWD)/python && rm -rf github_libs); done) || echo "Fail to create !!! ($(PWD)/python)"; \
 	fi
 	@echo
 
 $(PYTHON_FILES): layer_python
 	@echo
 	@echo '----->> run $@'
-	$(SUDO_EX) PYTHONPATH=$(PWD)/python ./$@ $(DEBUG_ARG)
+	[ -d "$(PWD)/python" ] && $(SUDO_EX) PYTHONPATH=$(PWD)/python ./$@ $(DEBUG_ARG)
