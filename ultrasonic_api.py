@@ -24,16 +24,10 @@ import threading
 BCM_TRIGGER=5#29
 BCM_ECHO=6#31
 
-trigger = {"name": "trigger", "bcmid": BCM_TRIGGER, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.OUT, "val": GPIO.LOW, "reply": "echo", "threading_pause": 1, "threading_handler": None, "threading_cond": None, "threading_pause": 1}
-echo = {"name": "echo", "bcmid": BCM_ECHO, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.IN, "val": GPIO.LOW, "distance": 0, "distance_last": [], "duration": 0, "s_time": 0, "e_time": 0}
+trigger = {"name": "trigger", "bcmid": BCM_TRIGGER, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.OUT, "val": GPIO.LOW, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "threading_pause": 1}
+echo = {"name": "echo", "bcmid": BCM_ECHO, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.IN, "val": GPIO.LOW, "edge": rpip9gpio.EDGE_DEFAULT, "distance": 0, "distance_last": [], "duration": 0, "s_time": 0, "e_time": 0}
 
 ultrasonic_gpio = {"trigger": trigger, "echo": echo}
-
-# 0: loop, 1: wait_for_edge, 2: event_detect
-ULTRASONIC_EDGE_LOOP=0
-ULTRASONIC_EDGE_WAIT=1
-ULTRASONIC_EDGE_EVENT=2
-ULTRASONIC_EDGE_DEFAULT=ULTRASONIC_EDGE_EVENT
 
 class ultrasonic_ctx(rpip9gpio):
 
@@ -76,7 +70,7 @@ class ultrasonic_ctx(rpip9gpio):
 				else:
 					gpioX["e_time"] = time.time()
 
-	def echo_wait_edge(self, gpioX, val):
+	def edge_wait(self, gpioX, val):
 		#self.linkGPIO()
 		#DBG_IF_LN(self, "start {}".format(gpioX["bcmid"]))
 		if (gpioX is not None):
@@ -90,7 +84,7 @@ class ultrasonic_ctx(rpip9gpio):
 				if (channel is not None):
 					gpioX["e_time"] = time.time()
 
-	def echo_edge_detect_cb(self, bcmid):
+	def edge_detect_cb(self, bcmid):
 		val = self.gpioGetValWithID(bcmid)
 		#DBG_IF_LN(self, "(bcmid: {}, val: {})".format(bcmid, val))
 		for key, gpioX in self.gpioXlist.items():
@@ -115,7 +109,7 @@ class ultrasonic_ctx(rpip9gpio):
 		#gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None) and ("threading_pause" in gpioX):
 			gpioX["threading_pause"] = 0
-			DBG_WN_LN(self, "run in loop ... ({}: {}, use_edge: {})".format( gpioX["name"], gpioX["bcmid"], self.use_edge) )
+			DBG_WN_LN(self, "run in loop ... ({}: {}, bcmid: {})".format( gpioX["name"], gpioX["val"], gpioX["bcmid"]) )
 			self.cond_wakeup(gpioX)
 
 	def threadx_run_all(self):
@@ -128,19 +122,19 @@ class ultrasonic_ctx(rpip9gpio):
 		gpioX_echo["e_time"] = 0
 		self.start_shout(gpioX_trigger)
 
-		if ( self.use_edge == ULTRASONIC_EDGE_LOOP):
+		if ("edge" in gpioX_echo) and ( gpioX_echo["edge"] == rpip9gpio.EDGE_BUSY):
 			self.echo_value_tick(gpioX_echo, True)
 			self.echo_value_tick(gpioX_echo, False)
-		elif ( self.use_edge == ULTRASONIC_EDGE_WAIT):
-			self.echo_wait_edge(gpioX_echo, True)
-			self.echo_wait_edge(gpioX_echo, False)
-		elif ( self.use_edge == ULTRASONIC_EDGE_EVENT):
+		elif ("edge" in gpioX_echo) and ( gpioX_echo["edge"] == rpip9gpio.EDGE_WAIT):
+			self.edge_wait(gpioX_echo, True)
+			self.edge_wait(gpioX_echo, False)
+		elif ("edge" in gpioX_echo) and ( gpioX_echo["edge"] == rpip9gpio.EDGE_EVENT):
 			self.cond_sleep(gpioX_trigger)
 		self.distance(gpioX_echo)
 		self.watch(gpioX_echo)
 
 	def threadx_handler(self, gpioX_trigger, gpioX_echo):
-		DBG_WN_LN(self, "looping ... ({}: {}, {}: {}, use_edge: {})".format(gpioX_trigger["name"], gpioX_trigger["bcmid"], gpioX_echo["name"], gpioX_echo["bcmid"], self.use_edge))
+		DBG_WN_LN(self, "looping ... ({}: {}, bcmid:{}, {}: {}, bcmid:{}, edge: {})".format(gpioX_trigger["name"], gpioX_trigger["val"], gpioX_trigger["bcmid"], gpioX_echo["name"], gpioX_echo["val"], gpioX_echo["bcmid"], gpioX_echo["edge"]))
 		if (gpioX_trigger is not None) and (gpioX_echo is not None):
 			while (self.is_quit == 0):
 				if ("threading_pause" in gpioX_trigger) and (gpioX_trigger["threading_pause"] == 1):
@@ -148,7 +142,7 @@ class ultrasonic_ctx(rpip9gpio):
 				else:
 					self.threadx_tick(gpioX_trigger, gpioX_echo)
 				#sleep(self.hold_sec)
-		DBG_WN_LN(self, "{} ({}: {}, {}: {})".format(DBG_TXT_BYE_BYE, gpioX_trigger["name"], gpioX_trigger["bcmid"], gpioX_echo["name"], gpioX_echo["bcmid"]))
+		DBG_WN_LN(self, "{} ({}: {}, bcmid:{}, {}: {}, bcmid:{})".format(DBG_TXT_BYE_BYE, gpioX_trigger["name"], gpioX_trigger["bcmid"], gpioX_trigger["val"], gpioX_echo["name"], gpioX_echo["val"], gpioX_echo["bcmid"]))
 
 	def cond_wakeup(self, gpioX):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
@@ -160,7 +154,7 @@ class ultrasonic_ctx(rpip9gpio):
 	def cond_sleep(self, gpioX):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
 			gpioX["threading_cond"].acquire()
-			DBG_WN_LN(self, "wait ... ({}: {})".format(gpioX["name"], gpioX["bcmid"]))
+			DBG_WN_LN(self, "wait ... ({}: {}, bcmid: {})".format(gpioX["name"], gpioX["val"], gpioX["bcmid"]))
 			gpioX["threading_cond"].wait()
 			gpioX["threading_cond"].release()
 			#DBG_IF_LN(self, "exit")
@@ -191,7 +185,7 @@ class ultrasonic_ctx(rpip9gpio):
 
 			if ( self.gpioXlnk == 1 ):
 				for key, gpioX in self.gpioXlist.items():
-					if (gpioX["direction"] == GPIO.IN ):
+					if ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio.EDGE_EVENT):
 						GPIO.remove_event_detect(gpioX["bcmid"])
 
 				DBG_WN_LN("call GPIO.cleanup ...")
@@ -206,7 +200,7 @@ class ultrasonic_ctx(rpip9gpio):
 		self.echo_timeout = 5000
 		self.edge_timeout = 1000
 		self.average = 0
-		self.use_edge = edge_mode
+		self.gpioX_echo["edge"] = edge_mode
 
 		self.hold_sec = 0.01
 
@@ -219,7 +213,7 @@ class ultrasonic_ctx(rpip9gpio):
 
 		sleep(0.5)
 
-	def __init__(self, edge_mode=ULTRASONIC_EDGE_DEFAULT, **kwargs):
+	def __init__(self, edge_mode=rpip9gpio.EDGE_DEFAULT, **kwargs):
 		if ( isPYTHON(PYTHON_V3) ):
 			super().__init__(**kwargs)
 		else:
@@ -238,9 +232,10 @@ class ultrasonic_ctx(rpip9gpio):
 		self.linkGPIO()
 		self.parse_args(args)
 
-		if ( self.use_edge == ULTRASONIC_EDGE_EVENT):
-			DBG_IF_LN("call add_event_detect ...")
-			GPIO.add_event_detect(self.gpioX_echo["bcmid"], GPIO.BOTH, callback=self.echo_edge_detect_cb)
+		for key, gpioX in self.gpioXlist.items():
+			if ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio.EDGE_EVENT):
+				DBG_IF_LN("call add_event_detect ...")
+				GPIO.add_event_detect(gpioX["bcmid"], GPIO.BOTH, callback=self.edge_detect_cb)
 
 		if (self.keyboard==1):
 			self.keyboard_recv()

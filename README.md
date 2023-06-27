@@ -160,7 +160,35 @@ flowchart LR
 
 ```
 
+```bash
+$ make xtrack_18_123.py
+----->> layer_python - /work/codebase/lankahsu520/RPiP9/python
 
+
+----->> run xtrack_18_123.py
+PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./xtrack_18_123.py -d 3
+[17053/1981854784] xtrack_api.py|threadx_handler:0110 - looping ... (m0: 0, bcmid:18)
+[17053/1981854784] xtrack_api.py|cond_sleep:0130 - wait ... (m0: 0, bcmid: 18)
+[17053/1996340032] rpip9gpio.py|linkGPIO:0050 - call GPIO.setmode ... (gpioXmode: 11)
+[17053/1996340032] rpip9gpio.py|linkGPIO:0073 - CONTROL_NORMAL ... (key: m0, bcmid: 18, direction: 1)
+[17053/1996340032] xtrack_api.py|start:0204 - call add_event_detect ...
+[17053/1996340032] xtrack_api.py|keyboard_recv:0136 - press q to quit the loop (enter: start, space: pause) ...
+[17053/1996340032] xtrack_api.py|threadx_run_loop:0093 - run in loop ... (m0: 0, bcmid: 18)
+[17053/1981854784] xtrack_api.py|cond_sleep:0130 - wait ... (m0: 0, bcmid: 18)
+[17053/1972368448] xtrack_api.py|edge_detect_cb:0077 - (m0: 1, bcmid: 18)
+[17053/1972368448] xtrack_api.py|edge_detect_cb:0077 - (m0: 0, bcmid: 18)
+[17053/1972368448] xtrack_api.py|edge_detect_cb:0077 - (m0: 1, bcmid: 18)
+[17053/1972368448] xtrack_api.py|edge_detect_cb:0077 - (m0: 0, bcmid: 18)
+[17053/1972368448] xtrack_api.py|edge_detect_cb:0077 - (m0: 1, bcmid: 18)
+[17053/1972368448] xtrack_api.py|edge_detect_cb:0077 - (m0: 0, bcmid: 18)
+[17053/1972368448] xtrack_api.py|edge_detect_cb:0077 - (m0: 1, bcmid: 18)
+[17053/1972368448] xtrack_api.py|edge_detect_cb:0077 - (m0: 0, bcmid: 18)
+[17053/1996340032] xtrack_api.py|release:0151 - (is_quit: 0, gpioXlnk: 1)
+[17053/1981854784] xtrack_api.py|threadx_handler:0118 - Bye-Bye !!! (m0: 0, bcmid:18)
+[17053/1996340032] xtrack_api.py|release:0164 - call GPIO.cleanup ...
+[17053/1996340032] xtrack_18_123.py|main:0120 - Bye-Bye !!! (is_quit: 1)
+
+```
 
 
 #### - ultrasonic_123.py : [HC-SR04](https://datasheetspdf.com/pdf/1380138/ETC1/HC-SR04/1), Ultrasonic Sensor example

@@ -114,7 +114,7 @@ class servo_ctx(rpip9gpio):
 		#gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None) and ("threading_pause" in gpioX):
 			gpioX["threading_pause"] = 0
-			DBG_WN_LN(self, "run in loop ... ({}: {})".format( gpioX["name"], gpioX["bcmid"]) )
+			DBG_WN_LN(self, "run in loop ... ({}: {}, bcmid: {})".format( gpioX["name"], gpioX["val"], gpioX["bcmid"]) )
 			self.cond_wakeup(gpioX)
 
 	def threadx_run_all(self):
@@ -126,7 +126,7 @@ class servo_ctx(rpip9gpio):
 		self.servo_move(gpioX)
 
 	def threadx_handler(self, gpioX):
-		DBG_WN_LN(self, "looping ... ({}: {})".format(gpioX["name"], gpioX["bcmid"]))
+		DBG_WN_LN(self, "looping ... ({}: {}, bcmid: {})".format(gpioX["name"], gpioX["val"], gpioX["bcmid"]))
 		if (gpioX is not None):
 			while (self.is_quit == 0):
 				if ("threading_pause" in gpioX) and (gpioX["threading_pause"] == 1):
@@ -134,7 +134,7 @@ class servo_ctx(rpip9gpio):
 				else:
 					self.threadx_tick(gpioX)
 				#sleep(self.hold_sec)
-		DBG_WN_LN(self, "{} ({}: {})".format(DBG_TXT_BYE_BYE, gpioX["name"], gpioX["bcmid"]))
+		DBG_WN_LN(self, "{} ({}: {}, bcmid: {}".format(DBG_TXT_BYE_BYE, gpioX["name"], gpioX["val"], gpioX["bcmid"]))
 
 	def cond_wakeup(self, gpioX):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
@@ -146,7 +146,7 @@ class servo_ctx(rpip9gpio):
 	def cond_sleep(self, gpioX):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
 			gpioX["threading_cond"].acquire()
-			DBG_WN_LN(self, "wait ... ({}: {})".format(gpioX["name"], gpioX["bcmid"]))
+			DBG_WN_LN(self, "wait ... ({}: {}, bcmid: {})".format(gpioX["name"], gpioX["val"], gpioX["bcmid"]))
 			gpioX["threading_cond"].wait()
 			gpioX["threading_cond"].release()
 			#DBG_IF_LN(self, "exit")

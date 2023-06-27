@@ -31,6 +31,12 @@ class rpip9gpio(pythonX9):
 	CONTROL_SW=1
 	CONTROL_HW=2
 
+	# 0: busy loop, 1: wait_for_edge, 2: event_detect
+	EDGE_BUSY=0
+	EDGE_WAIT=1 # GPIO.wait_for_edge
+	EDGE_EVENT=2 # GPIO.add_event_detect
+	EDGE_DEFAULT=EDGE_EVENT
+
 	def setGPIO(self, key, bcmid):
 		if ( self.gpioXlnk == 0 ):
 			DBG_IF_LN(self, "(key: {}, bcmid: {})".format(key, bcmid) )
