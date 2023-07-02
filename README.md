@@ -367,32 +367,7 @@ Run an example and read it.
 
 ## I.1. [Servo Motor Control Using Raspberry Pi](https://www.donskytech.com/servo-motor-control-using-raspberry-pi/)
 
-## I.2. [How to Update Python on Raspberry Pi](https://linuxhint.com/update-python-raspberry-pi/)
-
-```bash
-$ wget https://www.python.org/ftp/python/3.11.4/Python-3.11.4.tgz
-$ tar -zxvf Python-3.11.4.tgz
-$ cd Python-3.11.4
-$ ./configure --enable-optimizations
-$ sudo make altinstall
-$ ll /usr/local/bin/python3*
-$ cd /usr/bin
-$ ll python*
-$ sudo rm python3
-$ sudo rm python3-config
-$ sudo ln -s /usr/local/bin/python3.11 python3
-$ sudo ln -s /usr/local/bin/python3.11-config python3-config
-$ python3 -V
-
-$ python3 -m pip list
-
-$ python3 -m pip install --upgrade --force-reinstall pip
-$ sudo mv /usr/bin/pip3 /usr/bin/pip3-old
-$ sudo cp /home/pi/.local/bin/pip3 /usr/bin/pip3
-$ pip3 -V
-```
-
-## I.3. [【树莓派/入门】使用MAX30102测量血氧浓度](https://blog.csdn.net/qq_33446100/article/details/128537113)
+## I.2. [【树莓派/入门】使用MAX30102测量血氧浓度](https://blog.csdn.net/qq_33446100/article/details/128537113)
 
 # II. Debug
 
