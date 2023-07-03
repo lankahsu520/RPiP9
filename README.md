@@ -212,11 +212,14 @@ $ make traffic_lights_123.py
 >
 > 請使用者自行調整 "edge"，在遍尋網路上的示範裏少有的。
 >
-> 	# 0: busy loop, 1: wait_for_edge, 2: event_detect
-> 	EDGE_BUSY=0
-> 	EDGE_WAIT=1 # GPIO.wait_for_edge
-> 	EDGE_EVENT=2 # GPIO.add_event_detect
-> 	EDGE_DEFAULT=EDGE_EVENT
+
+```python
+	# 0: busy loop, 1: wait_for_edge, 2: event_detect
+	EDGE_BUSY=0
+	EDGE_WAIT=1 # GPIO.wait_for_edge
+	EDGE_EVENT=2 # GPIO.add_event_detect
+	EDGE_DEFAULT=EDGE_EVENT
+```
 
 ![tracker001](./images/tracker001.jpg)
 ```mermaid
