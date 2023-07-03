@@ -454,6 +454,8 @@ Run an example and read it.
 
 ## I.3. [Raspberry Pi Pinout](https://pinout.xyz/)
 
+![pinout.xyz](./images/pinout.xyz.png)
+
 # II. Debug
 
 ## II.1. Can’t connect to pigpio at localhost(8888)
