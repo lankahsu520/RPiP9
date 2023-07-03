@@ -31,8 +31,8 @@ def app_start():
 
 	#DBG_ER_LN("(dbg_more: {})".format( app_apps["dbg_more"] ))
 
-	xtrack_mgr = xtrack_ctx(tracks_gpio=tracks_gpio_18, dbg_more=app_apps["dbg_more"])
-	#xtrack_mgr = xtrack_ctx(tracks_gpio=tracks_gpio_all, dbg_more=app_apps["dbg_more"])
+	xtrack_mgr = xtrack_ctx(gpioXlist=tracks_gpio_18, dbg_more=app_apps["dbg_more"])
+	#xtrack_mgr = xtrack_ctx(gpioXlist=tracks_gpio_all, dbg_more=app_apps["dbg_more"])
 	app_watch(xtrack_mgr)
 	xtrack_mgr.start( app_apps )
 

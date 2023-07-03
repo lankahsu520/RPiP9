@@ -27,6 +27,8 @@ Do nothing
 #### - servo_tilt_123.py : [SG90](https://datasheetspdf.com/pdf/791970/TowerPro/SG90/1) (180 degree Rotation), Micro Servo example
 
 > a frequency of 50Hz. That frequency was selected because the servo motor expect a pulse every 20ms (period), that means 50 pulses per second or Hertz.
+>
+> 範例中，使用者可以使用 GPIO.PWM (rpip9gpio.CONTROL_SW) 或是使用 hardware_PWM (rpip9gpio.CONTROL_HW)  進行操作。操作中可以發現，使用軟體(GPIO.PWM)模擬時，抖動的情形會很明顯。
 
 ![servoSG9001](./images/servoSG9001.jpg)
 ![servoSG9001](./images/servoSG9002.jpg)
@@ -137,7 +139,84 @@ PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./servo_tilt_pan_123.py -d 3
 
 ```
 
+#### - traffic_lights_123.py : Traffic Lights example
+
+> 這是一個很簡單的 GPIO.OUT 操作。
+
+![traffic_lights01](./images/traffic_lights01.jpg)
+```mermaid
+flowchart LR
+	subgraph "traffic lights"
+		GND_lights["GND"]
+		R_lights["Red"]
+		Y_lights["Yellow"]
+		G_lights["Green"]
+	end
+	subgraph "Raspberry Pi"
+		BCM17[BCM 17]
+		BCM27[BCM 27]
+		BCM22[BCM 22]
+		GND_PI[GND]
+	end
+	BCM17 <--> R_lights
+	BCM27 <--> Y_lights
+	BCM22 <--> G_lights
+	GND_PI <--> GND_lights
+```
+
+```bash
+$ make traffic_lights_123.py
+----->> layer_python - /work/codebase/lankahsu520/RPiP9/python
+
+
+----->> run traffic_lights_123.py
+[ -d "/work/codebase/lankahsu520/RPiP9/python" ] &&  PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./traffic_lights_123.py -d 3
+[22395/1984283712] traffic_lights_api.py|threadx_handler:0124 - looping ... (gpioX[R/17]: 0)
+[22395/1984283712] traffic_lights_api.py|cond_sleep:0152 - wait ... (gpioX[R/17]: 0)
+[22395/1995558976] rpip9gpio.py|linkGPIO:0087 - call GPIO.setmode ... (gpioXmode: GPIO.BCM)
+[22395/1995558976] rpip9gpio.py|linkGPIO:0092 - CONTROL_NORMAL (gpioX[R/17]: 0, direction: GPIO.OUT)
+[22395/1995558976] rpip9gpio.py|linkGPIO:0092 - CONTROL_NORMAL (gpioX[Y/27]: 0, direction: GPIO.OUT)
+[22395/1995558976] rpip9gpio.py|linkGPIO:0092 - CONTROL_NORMAL (gpioX[G/22]: 0, direction: GPIO.OUT)
+[22395/1995558976] traffic_lights_api.py|keyboard_recv:0158 - press q to quit the loop (enter: start, space: pause, a: all on, r: Red on, y: Yellow on, g: Green on) ...
+[22395/1995558976] traffic_lights_api.py|lightX_helper:0038 - (gpioX[R/17]: 0)
+[22395/1995558976] traffic_lights_api.py|lightX_helper:0038 - (gpioX[Y/27]: 0)
+[22395/1995558976] traffic_lights_api.py|lightX_helper:0038 - (gpioX[G/22]: 0)
+[22395/1995558976] traffic_lights_api.py|threadx_run_loop:0085 - run in loop ... (gpioX[R/17]: 0)
+[22395/1984283712] traffic_lights_api.py|lightX_helper:0038 - (gpioX[R/17]: 1)
+[22395/1984283712] traffic_lights_api.py|cond_wait:0144 - wait ... (gpioX[R/17]: 1)
+[22395/1984283712] traffic_lights_api.py|lightX_helper:0038 - (gpioX[R/17]: 0)
+[22395/1984283712] traffic_lights_api.py|lightX_helper:0038 - (gpioX[Y/27]: 1)
+[22395/1984283712] traffic_lights_api.py|cond_wait:0144 - wait ... (gpioX[R/17]: 0)
+[22395/1984283712] traffic_lights_api.py|lightX_helper:0038 - (gpioX[Y/27]: 0)
+[22395/1984283712] traffic_lights_api.py|lightX_helper:0038 - (gpioX[G/22]: 1)
+[22395/1984283712] traffic_lights_api.py|cond_wait:0144 - wait ... (gpioX[R/17]: 0)
+[22395/1984283712] traffic_lights_api.py|lightX_helper:0038 - (gpioX[G/22]: 0)
+[22395/1984283712] traffic_lights_api.py|lightX_helper:0038 - (gpioX[Y/27]: 1)
+[22395/1984283712] traffic_lights_api.py|cond_wait:0144 - wait ... (gpioX[R/17]: 0)
+[22395/1984283712] traffic_lights_api.py|lightX_helper:0038 - (gpioX[Y/27]: 0)
+[22395/1984283712] traffic_lights_api.py|lightX_helper:0038 - (gpioX[R/17]: 1)
+[22395/1984283712] traffic_lights_api.py|cond_wait:0144 - wait ... (gpioX[R/17]: 1)
+[22395/1995558976] traffic_lights_api.py|lightX_helper:0038 - (gpioX[R/17]: 0)
+[22395/1995558976] traffic_lights_api.py|lightX_helper:0038 - (gpioX[Y/27]: 0)
+[22395/1995558976] traffic_lights_api.py|lightX_helper:0038 - (gpioX[G/22]: 0)
+[22395/1995558976] traffic_lights_api.py|release:0183 - (is_quit: 0, gpioXlnk: 1)
+[22395/1984283712] traffic_lights_api.py|threadx_handler:0132 - Bye-Bye !!! (gpioX[R/17]: 0)
+[22395/1995558976] traffic_lights_api.py|release:0196 - call GPIO.cleanup ...
+[22395/1995558976] traffic_lights_123.py|main:0119 - Bye-Bye !!! (is_quit: 1)
+
+```
+
 #### - xtrack_18_123.py : Tracker Sensor (TCRT5000), Tracker Sensor example
+
+> 這是一個很簡單的 GPIO.IN 操作。
+>
+> 請使用者自行調整 "edge"，在遍尋網路上的示範裏少有的。
+>
+> 	# 0: busy loop, 1: wait_for_edge, 2: event_detect
+> 	EDGE_BUSY=0
+> 	EDGE_WAIT=1 # GPIO.wait_for_edge
+> 	EDGE_EVENT=2 # GPIO.add_event_detect
+> 	EDGE_DEFAULT=EDGE_EVENT
 
 ![tracker001](./images/tracker001.jpg)
 ```mermaid
@@ -298,6 +377,10 @@ PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./xtrack_all_456.py -d 3
 
 #### - ultrasonic_123.py : [HC-SR04](https://datasheetspdf.com/pdf/1380138/ETC1/HC-SR04/1), Ultrasonic Sensor example
 
+> 包含了 GPIO.IN 和 GPIO.OUT 操作。
+>
+> 請使用者自行調整 "edge"，在遍尋網路上的示範裏少有的。
+
 ![ultrasonic01](./images/ultrasonic01.jpg)
 
 ```mermaid
@@ -368,6 +451,8 @@ Run an example and read it.
 ## I.1. [Servo Motor Control Using Raspberry Pi](https://www.donskytech.com/servo-motor-control-using-raspberry-pi/)
 
 ## I.2. [【树莓派/入门】使用MAX30102测量血氧浓度](https://blog.csdn.net/qq_33446100/article/details/128537113)
+
+## I.3. [Raspberry Pi Pinout](https://pinout.xyz/)
 
 # II. Debug
 

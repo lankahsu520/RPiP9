@@ -143,6 +143,14 @@ class servo_ctx(rpip9gpio):
 			gpioX["threading_cond"].notify()
 			gpioX["threading_cond"].release()
 
+	def cond_wait(self, gpioX, timeout):
+		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
+			gpioX["threading_cond"].acquire()
+			DBG_WN_LN(self, "wait ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
+			gpioX["threading_cond"].wait(timeout)
+			gpioX["threading_cond"].release()
+			#DBG_IF_LN(self, "exit")
+
 	def cond_sleep(self, gpioX):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
 			gpioX["threading_cond"].acquire()
@@ -198,8 +206,8 @@ class servo_ctx(rpip9gpio):
 				DBG_WN_LN("call GPIO.cleanup ...")
 				GPIO.cleanup()
 
-	def ctx_init(self, servo_gpio):
-		self.gpioXlist = servo_gpio
+	def ctx_init(self, gpioXlist):
+		self.gpioXlist = gpioXlist
 
 		self.hold_sec = 0.01
 
@@ -212,7 +220,7 @@ class servo_ctx(rpip9gpio):
 
 		sleep(0.5)
 
-	def __init__(self, servo_gpio=servo_hw_tilt_and_pan, **kwargs):
+	def __init__(self, gpioXlist=servo_hw_tilt_and_pan, **kwargs):
 		if ( isPYTHON(PYTHON_V3) ):
 			super().__init__(**kwargs)
 		else:
@@ -220,7 +228,7 @@ class servo_ctx(rpip9gpio):
 
 		DBG_TR_LN(self, "{}".format(DBG_TXT_ENTER))
 		self._kwargs = kwargs
-		self.ctx_init(servo_gpio)
+		self.ctx_init(gpioXlist)
 
 	def parse_args(self, args):
 		self._args = args

@@ -31,8 +31,8 @@ def app_start():
 
 	#DBG_ER_LN("(dbg_more: {})".format( app_apps["dbg_more"] ))
 
-	servo_mgr = servo_ctx(servo_gpio=servo_hw_tilt, dbg_more=app_apps["dbg_more"])
-	#servo_mgr = servo_ctx(servo_gpio=servo_sw_tilt_50, dbg_more=app_apps["dbg_more"])
+	servo_mgr = servo_ctx(gpioXlist=servo_hw_tilt, dbg_more=app_apps["dbg_more"])
+	#servo_mgr = servo_ctx(gpioXlist=servo_sw_tilt_50, dbg_more=app_apps["dbg_more"])
 	app_watch(servo_mgr)
 	servo_mgr.start( app_apps )
 

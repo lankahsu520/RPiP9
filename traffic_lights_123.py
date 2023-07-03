@@ -17,7 +17,7 @@
  ***************************************************************************
 """
 
-from servo_api import *
+from traffic_lights_api import *
 
 app_list = []
 is_quit = 0
@@ -31,10 +31,9 @@ def app_start():
 
 	#DBG_ER_LN("(dbg_more: {})".format( app_apps["dbg_more"] ))
 
-	servo_mgr = servo_ctx(gpioXlist=servo_hw_tilt_and_pan, dbg_more=app_apps["dbg_more"])
-	#servo_mgr = servo_ctx(gpioXlist=servo_sw_tilt_pan_50, dbg_more=app_apps["dbg_more"])
-	app_watch(servo_mgr)
-	servo_mgr.start( app_apps )
+	traffic_lights_mgr = traffic_lights_ctx(gpioXlist=traffic_lights_gpio_all, dbg_more=app_apps["dbg_more"])
+	app_watch(traffic_lights_mgr)
+	traffic_lights_mgr.start( app_apps )
 
 def app_watch(app_ctx):
 	global app_list
@@ -70,8 +69,6 @@ def app_exit():
 def show_usage(argv):
 	print("Usage: {} <options...>".format(argv[0]) )
 	print("  -h, --help")
-	print("  -p, --pan 90")
-	print("  -t, --tilt 90")
 	print("  -k, --key")
 	print("(sudo systemctl status pigpiod)")
 	print("(sudo service pigpiod start)\n")
@@ -82,7 +79,7 @@ def parse_arg(argv):
 	global app_apps
 
 	try:
-		opts,args = getopt.getopt(argv[1:], "hd:p:t:k", ["help", "debug", "pan", "tilt", "key"]);
+		opts,args = getopt.getopt(argv[1:], "hd:k", ["help", "debug", "key"]);
 	except getopt.GetoptError:
 		show_usage(argv)
 
@@ -95,10 +92,6 @@ def parse_arg(argv):
 				show_usage(argv)
 			elif opt in ("-d", "--debug"):
 				app_apps["dbg_more"] = dbg_debug_helper( int(arg) )
-			elif opt in ("-p", "--pan"):
-				app_apps["PanAngle"] = int(arg)
-			elif opt in ("-t", "--tilt"):
-				app_apps["TiltAngle"] = int(arg)
 			elif opt in ("-k", "--key"):
 				app_apps["keyboard"] = 1
 			else:

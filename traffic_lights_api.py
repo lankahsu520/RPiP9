@@ -21,60 +21,52 @@ from rpip9gpio import *
 import threading
 #from _thread import start_new_thread
 
-BCM_L2TRACK=24#5
-BCM_L1TRACK=23#3
-BCM_M0TRACK=18#1
-BCM_R1TRACK=15#16
-BCM_R2TRACK=14#15
+BCM_R=17#0
+BCM_Y=27#2
+BCM_G=22#3
+lightR = {"name": "R", "bcmid": BCM_R, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.OUT, "val": GPIO.LOW, "delay": 3, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
+lightY = {"name": "Y", "bcmid": BCM_Y, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.OUT, "val": GPIO.LOW, "delay": 1}
+lightG = {"name": "G", "bcmid": BCM_G, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.OUT, "val": GPIO.LOW, "delay": 5}
 
-l2track = {"name": "l2", "bcmid": BCM_L2TRACK, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.IN, "val": GPIO.LOW, "edge": rpip9gpio.EDGE_DEFAULT, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
-l1track = {"name": "l1", "bcmid": BCM_L1TRACK, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.IN, "val": GPIO.LOW, "edge": rpip9gpio.EDGE_DEFAULT, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
-m0track = {"name": "m0", "bcmid": BCM_M0TRACK, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.IN, "val": GPIO.LOW, "edge": rpip9gpio.EDGE_DEFAULT, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
-r1track = {"name": "r1", "bcmid": BCM_R1TRACK, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.IN, "val": GPIO.LOW, "edge": rpip9gpio.EDGE_DEFAULT, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
-r2track = {"name": "r2", "bcmid": BCM_R2TRACK, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.IN, "val": GPIO.LOW, "edge": rpip9gpio.EDGE_DEFAULT, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
+traffic_lights_gpio_all= {"R": lightR, "Y": lightY, "G": lightG }
 
-tracks_gpio_all = {"l2": l2track, "l1": l1track, "m0": m0track, "r1": r1track, "r2": r2track }
-tracks_gpio_18 = {"m0": m0track}
+class traffic_lights_ctx(rpip9gpio):
 
-class xtrack_ctx(rpip9gpio):
+	def lightX_helper(self, gpioX, val):
+		if (gpioX is not None):
+			self.gpioSetHelper(gpioX, val)
+			DBG_IF_LN(self, "(gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 
-	def xtrack_start(self, key):
+	def lightX_on(self, gpioX):
+		if (gpioX is not None):
+			self.lightX_helper(gpioX, 1)
+
+	def lightX_off(self, gpioX):
+		if (gpioX is not None):
+			self.lightX_helper(gpioX, 0)
+
+	def light_on(self, key):
+		gpioX = self.gpioXlist.get(key)
+		if (gpioX is not None):
+			self.lightX_helper(gpioX, 1)
+
+	def light_off(self, key):
+		gpioX = self.gpioXlist.get(key)
+		if (gpioX is not None):
+			self.lightX_helper(gpioX, 0)
+
+	def light_all_on(self):
+		for key, gpioX in self.gpioXlist.items():
+			self.lightX_helper(gpioX, 1)
+
+	def light_all_off(self):
+		for key, gpioX in self.gpioXlist.items():
+			self.lightX_helper(gpioX, 0)
+
+	def traffic_light_start(self, key):
 		gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None):
 			self.threadx_run_loop(gpioX)
-
-	def edge_busy(self, gpioX):
-		if (gpioX is not None):
-			val_org = gpioX["val"]
-			gpioX["val"] = self.gpioGetVal(gpioX)
-			if ( val_org != gpioX["val"] ):
-				DBG_IF_LN(self, "({}: {}, bcmid: {})".format(gpioX["name"], gpioX["val"], gpioX["bcmid"]))
-			else:
-				pass
-			sleep(self.hold_sec)
-
-	def edge_wait(self, gpioX):
-		#self.linkGPIO()
-		#DBG_IF_LN(self, "start {}".format(gpioX["bcmid"]))
-		if (gpioX is not None):
-			count_down = self.edge_timeout
-
-			channel = None
-			if (gpioX["val"] == 0):
-				channel = GPIO.wait_for_edge(gpioX["bcmid"], GPIO.RISING, timeout=count_down)
-			else:
-				channel = GPIO.wait_for_edge(gpioX["bcmid"], GPIO.FALLING, timeout=count_down)
-
-			if (channel is not None):
-				gpioX["val"] = self.gpioGetVal(gpioX)
-				DBG_IF_LN(self, "(gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
-
-	def edge_detect_cb(self, bcmid):
-		val = self.gpioGetValWithID(bcmid)
-		for key, gpioX in self.gpioXlist.items():
-			if (gpioX["bcmid"] == bcmid ):
-				gpioX["val"] = val
-				DBG_IF_LN(self, "(gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 
 	def threadx_pause(self, gpioX):
 		#gpioX = self.gpioXlist.get(key)
@@ -99,12 +91,34 @@ class xtrack_ctx(rpip9gpio):
 				self.threadx_run_loop(gpioX)
 
 	def threadx_tick(self, gpioX):
-		if ("edge" in gpioX) and ( gpioX["edge"] == rpip9gpio.EDGE_BUSY):
-			self.edge_busy(gpioX)
-		elif ("edge" in gpioX) and ( gpioX["edge"] == rpip9gpio.EDGE_WAIT):
-			self.edge_wait(gpioX)
-		elif ("edge" in gpioX) and ( gpioX["edge"] == rpip9gpio.EDGE_EVENT):
-			self.cond_sleep(gpioX)
+		self.lightX_on(self.gpioX_r)
+		#sleep(self.gpioX_r["delay"])
+		self.cond_wait(gpioX, self.gpioX_r["delay"])
+		if ( self.is_quit == 1 ):
+			return 1
+
+		self.lightX_off(self.gpioX_r)
+		self.lightX_on(self.gpioX_y)
+		#sleep(self.gpioX_y["delay"])
+		self.cond_wait(gpioX, self.gpioX_y["delay"])
+		if ( self.is_quit == 1 ):
+			return 1
+
+		self.lightX_off(self.gpioX_y)
+		self.lightX_on(self.gpioX_g)
+		#sleep(self.gpioX_g["delay"])
+		self.cond_wait(gpioX, self.gpioX_g["delay"])
+		if ( self.is_quit == 1 ):
+			return 1
+
+		self.lightX_off(self.gpioX_g)
+		self.lightX_on(self.gpioX_y)
+		#sleep(self.gpioX_y["delay"])
+		self.cond_wait(gpioX, self.gpioX_y["delay"])
+
+		self.lightX_off(self.gpioX_y)
+		if ( self.is_quit == 1 ):
+			return 1
 
 	def threadx_handler(self, gpioX):
 		DBG_WN_LN(self, "looping ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
@@ -141,13 +155,23 @@ class xtrack_ctx(rpip9gpio):
 			#DBG_IF_LN(self, "exit")
 
 	def keyboard_recv(self):
-		DBG_WN_LN(self, "press q to quit the loop (enter: start, space: pause) ...")
+		DBG_WN_LN(self, "press q to quit the loop (enter: start, space: pause, a: all on, r: Red on, y: Yellow on, g: Green on) ...")
 		k='\x00'
 		while ( self.is_quit == 0 ):
 			k = self.inkey()
 			self.threadx_pause_all()
+			self.light_all_off()
+			#DBG_WN_LN(self, ">>>>>>>> {}".format(k))
 			if k=='\x71': # q
 				break;
+			elif k=='\x61': # a
+				self.light_all_on()
+			elif k=='\x72': # r
+				self.light_on("R")
+			elif k=='\x79': # y
+				self.light_on("Y")
+			elif k=='\x67': # g
+				self.light_on("G")
 			elif k=='\x0d': # enter
 				self.threadx_run_all()
 			elif k=='\x20': # space
@@ -174,8 +198,9 @@ class xtrack_ctx(rpip9gpio):
 
 	def ctx_init(self, gpioXlist):
 		self.gpioXlist = gpioXlist
-
-		self.edge_timeout = 1000
+		self.gpioX_r = self.gpioXlist.get("R")
+		self.gpioX_y = self.gpioXlist.get("Y")
+		self.gpioX_g = self.gpioXlist.get("G")
 
 		self.hold_sec = 0.01
 
@@ -188,11 +213,11 @@ class xtrack_ctx(rpip9gpio):
 
 		sleep(0.5)
 
-	def __init__(self, gpioXlist=tracks_gpio_all, **kwargs):
+	def __init__(self, gpioXlist=traffic_lights_gpio_all, **kwargs):
 		if ( isPYTHON(PYTHON_V3) ):
 			super().__init__(**kwargs)
 		else:
-			super(xtrack_ctx, self).__init__(**kwargs)
+			super(traffic_lights_ctx, self).__init__(**kwargs)
 
 		DBG_TR_LN(self, "{}".format(DBG_TXT_ENTER))
 		self._kwargs = kwargs
@@ -214,9 +239,3 @@ class xtrack_ctx(rpip9gpio):
 
 		if (self.keyboard==1):
 			self.keyboard_recv()
-
-#xtrack_mgr = xtrack_ctx()
-##xtrack_mgr.keyboard_recv()
-#xtrack_mgr.xtrack_start("l1track")
-#while True:
-#	pass
