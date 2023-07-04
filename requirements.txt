@@ -3,3 +3,5 @@ netifaces==0.11.0
 RPi.GPIO==0.7.1
 pigpio==1.78
 #gpiozero==1.6.2
+#libgpiod==2.0.1
+adafruit-circuitpython-dht==4.0.2

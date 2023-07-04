@@ -27,7 +27,7 @@ BCM_M0TRACK=18#1
 BCM_R1TRACK=15#16
 BCM_R2TRACK=14#15
 
-l2track = {"name": "l2", "bcmid": BCM_L2TRACK, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.IN, "val": GPIO.LOW, "edge": rpip9gpio.EDGE_DEFAULT, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
+l2track = {"name": "l2", "direction": BCM_L2TRACK, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.IN, "val": GPIO.LOW, "edge": rpip9gpio.EDGE_DEFAULT, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
 l1track = {"name": "l1", "bcmid": BCM_L1TRACK, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.IN, "val": GPIO.LOW, "edge": rpip9gpio.EDGE_DEFAULT, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
 m0track = {"name": "m0", "bcmid": BCM_M0TRACK, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.IN, "val": GPIO.LOW, "edge": rpip9gpio.EDGE_DEFAULT, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
 r1track = {"name": "r1", "bcmid": BCM_R1TRACK, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.IN, "val": GPIO.LOW, "edge": rpip9gpio.EDGE_DEFAULT, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
@@ -127,7 +127,7 @@ class xtrack_ctx(rpip9gpio):
 	def cond_wait(self, gpioX, timeout):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
 			gpioX["threading_cond"].acquire()
-			DBG_WN_LN(self, "wait ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
+			DBG_DB_LN(self, "wait ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 			gpioX["threading_cond"].wait(timeout)
 			gpioX["threading_cond"].release()
 			#DBG_IF_LN(self, "exit")
@@ -208,7 +208,7 @@ class xtrack_ctx(rpip9gpio):
 		self.parse_args(args)
 
 		for key, gpioX in self.gpioXlist.items():
-			if  (gpioX["direction"] ==  GPIO.IN) and ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio.EDGE_EVENT):
+			if  ("direction" in gpioX) and (gpioX["direction"] ==  GPIO.IN) and ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio.EDGE_EVENT):
 				DBG_IF_LN("call add_event_detect .. (gpioX[{}/{}]: {}).".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 				GPIO.add_event_detect(gpioX["bcmid"], GPIO.BOTH, callback=self.edge_detect_cb)
 

@@ -10,10 +10,16 @@ RPiP9 把 Raspberry Pi 上常見的模組搜集而成。
 
 # 2. Depend on
 
-- [netifaces (0.11.0)](https://pypi.org/project/netifaces/)
-- [RPi.GPIO (0.7.1)](https://pypi.org/project/RPi.GPIO/)
-- [pigpio (1.78)](https://pypi.org/project/pigpio/)
+- [netifaces 0.11.0](https://pypi.org/project/netifaces/)
+- [RPi.GPIO 0.7.1](https://pypi.org/project/RPi.GPIO/)
+- [pigpio 1.78](https://pypi.org/project/pigpio/)
+- [libgpiod 2.0.1](https://pypi.org/project/libgpiod/)
 
+```bash
+sudo apt-get install libgpiod2
+```
+
+- [adafruit-circuitpython-dht 4.0.2](https://pypi.org/project/adafruit-circuitpython-dht/), [Adafruit_CircuitPython_DHT](https://github.com/adafruit/Adafruit_CircuitPython_DHT)
 
 # 3. Current Status
 
@@ -23,6 +29,51 @@ RPiP9 把 Raspberry Pi 上常見的模組搜集而成。
 Do nothing
 ```
 # 5. Example or Usage
+
+#### - dht11_123.py : [DHT11](https://datasheetspdf.com/pdf/792210/ABCPROYECTOS/DHT11/1), Temperature Sensor example
+
+> 相關說明可見 [Adafruit_CircuitPython_DHT](https://github.com/adafruit/Adafruit_CircuitPython_DHT)
+
+```mermaid
+flowchart LR
+	subgraph DHT11
+		VCC["VCC (3.3VDC A 5VDC) (pin 1)"]
+		Data["Data"]
+		None["None"]
+		GND["GND"]
+	end
+	subgraph "Raspberry Pi"
+		BCM4[BCM 4]
+		5V_PI[5V]
+		GND_PI[GND]
+	end
+	BCM4 <--> Data
+	5V_PI <--> VCC
+	GND_PI <--> GND
+```
+
+```bash
+$ make dht11_123.py
+----->> layer_python - /work/codebase/lankahsu520/RPiP9/python
+
+
+----->> run dht11_123.py
+[ -d "/work/codebase/lankahsu520/RPiP9/python" ] &&  PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./dht11_123.py -d 3
+[23306/1983243328] dhtx_api.py|threadx_handler:0086 - looping ... (gpioX[dht11/4]: 0)
+[23306/1983243328] dhtx_api.py|cond_sleep:0122 - wait ... (gpioX[dht11/4]: 0)
+[23306/1995710528] dhtx_api.py|keyboard_recv:0128 - press q to quit the loop (enter: start, space: pause) ...
+[23306/1995710528] dhtx_api.py|threadx_run_loop:0071 - run in loop ... (gpioX[dht11/4]: 0)
+[23306/1983243328] dhtx_api.py|threadx_tick:0082 - (gpioX[dht11/4], Temperature: 24.0 F / 75.2 C, Humidity: 34%)
+[23306/1983243328] dhtx_api.py|dhtx_lookup:0050 - A full buffer was not returned. Try again.
+[23306/1983243328] dhtx_api.py|threadx_tick:0082 - (gpioX[dht11/4], Temperature: 24.0 F / 75.2 C, Humidity: 34%)
+[23306/1983243328] dhtx_api.py|dhtx_lookup:0050 - A full buffer was not returned. Try again.
+[23306/1983243328] dhtx_api.py|threadx_tick:0082 - (gpioX[dht11/4], Temperature: 24.0 F / 75.2 C, Humidity: 34%)
+[23306/1983243328] dhtx_api.py|threadx_tick:0082 - (gpioX[dht11/4], Temperature: 24.0 F / 75.2 C, Humidity: 36%)
+[23306/1995710528] dhtx_api.py|release:0143 - (is_quit: 0, gpioXlnk: 0)
+[23306/1983243328] dhtx_api.py|threadx_handler:0102 - Bye-Bye !!! (gpioX[dht11/4]: 0)
+[23306/1995710528] dht11_123.py|main:0119 - Bye-Bye !!! (is_quit: 1)
+
+```
 
 #### - servo_tilt_123.py : [SG90](https://datasheetspdf.com/pdf/791970/TowerPro/SG90/1) (180 degree Rotation), Micro Servo example
 
@@ -36,15 +87,15 @@ Do nothing
 ```mermaid
 flowchart LR
 	subgraph ultrasonic
-    PWM["PWM (Orange)"]
-    VCC["VCC (Red)"]
+		PWM["PWM (Orange)"]
+		VCC["VCC (Red)"]
 		GND["GND (Brown)"]
 	end
 	subgraph "Raspberry Pi"
-    BCM12[BCM 12]
-    5V_PI[5V]
-    GND_PI[GND]
-  end
+		BCM12[BCM 12]
+		5V_PI[5V]
+		GND_PI[GND]
+	end
 	BCM12 <--> PWM
 	5V_PI <--> VCC
 	GND_PI <--> GND

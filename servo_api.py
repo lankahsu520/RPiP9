@@ -238,5 +238,11 @@ class servo_ctx(rpip9gpio):
 	def start(self, args={"keyboard": 0}):
 		self.linkGPIO()
 		self.parse_args(args)
+
+		for key, gpioX in self.gpioXlist.items():
+			if  ("direction" in gpioX) and (gpioX["direction"] ==  GPIO.IN) and ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio.EDGE_EVENT):
+				DBG_IF_LN("call add_event_detect .. (gpioX[{}/{}]: {}).".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
+				GPIO.add_event_detect(gpioX["bcmid"], GPIO.BOTH, callback=self.edge_detect_cb)
+
 		if (self.keyboard==1):
 			self.keyboard_recv()

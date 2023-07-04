@@ -19,6 +19,7 @@ GITHUB_LIBS = \
 
 #** PYTHON_FILES **
 PYTHON_FILES = \
+							dht11_123.py \
 							traffic_lights_123.py \
 							xtrack_all_456.py \
 							xtrack_18_123.py \

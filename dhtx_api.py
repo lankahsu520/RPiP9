@@ -21,79 +21,40 @@ from rpip9gpio import *
 import threading
 #from _thread import start_new_thread
 
-BCM_TRIGGER=5#29
-BCM_ECHO=6#31
+import board
+import adafruit_dht
 
-trigger = {"name": "trigger", "bcmid": BCM_TRIGGER, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.OUT, "val": GPIO.LOW, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "threading_pause": 1}
-echo = {"name": "echo", "bcmid": BCM_ECHO, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.IN, "val": GPIO.LOW, "edge": rpip9gpio.EDGE_DEFAULT, "distance": 0, "distance_last": [], "duration": 0, "s_time": 0, "e_time": 0}
+DHT_BOARD4=board.D4
+DHT_BOARD18=board.D18
 
-ultrasonic_gpio = {"trigger": trigger, "echo": echo}
+dht11 = {"name": "dht11", "type": "dht11", "bcmid": DHT_BOARD4, "dhtX": None, "val": GPIO.LOW, "delay": 3, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
+dht22 = {"name": "dht22", "type": "dht22", "bcmid": DHT_BOARD18, "dhtX": None, "val": GPIO.LOW, "delay": 3, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
 
-class ultrasonic_ctx(rpip9gpio):
+dht_gpio_all = {"dht11": dht11}
 
-	def watch(self, gpioX):
-		if (gpioX["e_time"]>0) and (gpioX["s_time"]>0):
-			DBG_IF_LN(self, "(distance: {} cm)".format( gpioX["distance"] ))
-		#print("(distance: {} cm)".format( gpioX["distance"] ) )
+class dhtx_ctx(rpip9gpio):
 
-	def distance(self, gpioX):
+	def dhtx_temperature(self, gpioX):
+		if (gpioX is not None) and (gpioX["dhtX"] is not None):
+			gpioX["temperature_c"] = gpioX["dhtX"].temperature
+			gpioX["temperature_f"] = gpioX["temperature_c"] * (9 / 5) + 32
+
+	def dhtx_humidity(self, gpioX):
 		if (gpioX is not None):
-			if (gpioX["e_time"]>0) and (gpioX["s_time"]>0):
-				gpioX["duration"] = gpioX["e_time"] - gpioX["s_time"]
-				if (self.average > 0):
-					gpioX["distance_last"].append(gpioX["duration"]  * 340 *100 /2) #17150
-					if ( len(gpioX["distance_last"]) > self.average ):
-						gpioX["distance_last"].pop(0)
-					gpioX["distance"] = averageX(gpioX["distance_last"])
-				else:
-					gpioX["distance"] = gpioX["duration"] * 17150
+			gpioX["humidity"] = gpioX["dhtX"].humidity
 
-	def start_shout(self, gpioX_trigger):
-		#self.linkGPIO()
-		if (gpioX_trigger is not None):
-			DBG_TR_LN(self, "shout !!! {}".format(gpioX_trigger))
-			self.gpioSetLow(gpioX_trigger)
-			sleep(self.hold_sec)
-			self.gpioSetHigh(gpioX_trigger)
-			sleep(self.shout_sec)
-			self.gpioSetLow(gpioX_trigger)
-
-	def echo_value_tick(self, gpioX, val):
-		#self.linkGPIO()
-		#DBG_TR_LN(self, start")
+	def dhtx_lookup(self, gpioX):
 		if (gpioX is not None):
-			count_down = self.echo_timeout
-			while (self.gpioGetVal(gpioX) != val ) and (count_down > 0) and (self.is_quit == 0):
-				count_down -= 1
-				if (val == True):
-					gpioX["s_time"] = time.time()
-				else:
-					gpioX["e_time"] = time.time()
+			try:
+				self.dhtx_temperature(gpioX)
+				self.dhtx_humidity(gpioX)
+			except RuntimeError as error:
+				DBG_ER_LN(self, "{}".format( error.args[0] ))
 
-	def edge_wait(self, gpioX, val):
-		#self.linkGPIO()
-		#DBG_IF_LN(self, "start {}".format(gpioX["bcmid"]))
+	def dhtx_start(self, key):
+		gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None):
-			count_down = self.edge_timeout
-			if (val == True):
-				channel = GPIO.wait_for_edge(gpioX["bcmid"], GPIO.RISING, timeout=count_down)
-				if (channel is not None):
-					gpioX["s_time"] = time.time()
-			else:
-				channel = GPIO.wait_for_edge(gpioX["bcmid"], GPIO.FALLING, timeout=count_down)
-				if (channel is not None):
-					gpioX["e_time"] = time.time()
-
-	def edge_detect_cb(self, bcmid):
-		val = self.gpioGetValWithID(bcmid)
-		#DBG_IF_LN(self, "(bcmid: {}, val: {})".format(bcmid, val))
-		for key, gpioX in self.gpioXlist.items():
-			if (gpioX["bcmid"] == bcmid ):
-				if ( val ):
-					gpioX["s_time"] = time.time()
-				else:
-					gpioX["e_time"] = time.time()
-					self.cond_wakeup(self.gpioX_trigger)
+			self.threadx_run_loop(gpioX)
 
 	def threadx_pause(self, gpioX):
 		#gpioX = self.gpioXlist.get(key)
@@ -117,32 +78,30 @@ class ultrasonic_ctx(rpip9gpio):
 			if ("threading_handler" in gpioX) and (gpioX["threading_handler"] is not None):
 				self.threadx_run_loop(gpioX)
 
-	def threadx_tick(self, gpioX_trigger, gpioX_echo):
-		gpioX_echo["s_time"] = 0
-		gpioX_echo["e_time"] = 0
-		self.start_shout(gpioX_trigger)
+	def threadx_tick(self, gpioX):
+		if (gpioX is not None):
+			self.dhtx_lookup(gpioX)
+			DBG_IF_LN(self, "(gpioX[{}/{}], Temperature: {:.1f} F / {:.1f} C, Humidity: {}%)".format( gpioX["name"], gpioX["bcmid"], gpioX["temperature_c"], gpioX["temperature_f"], gpioX["humidity"]) )
+			self.cond_wait(gpioX, gpioX["delay"])
 
-		if ("edge" in gpioX_echo) and ( gpioX_echo["edge"] == rpip9gpio.EDGE_BUSY):
-			self.echo_value_tick(gpioX_echo, True)
-			self.echo_value_tick(gpioX_echo, False)
-		elif ("edge" in gpioX_echo) and ( gpioX_echo["edge"] == rpip9gpio.EDGE_WAIT):
-			self.edge_wait(gpioX_echo, True)
-			self.edge_wait(gpioX_echo, False)
-		elif ("edge" in gpioX_echo) and ( gpioX_echo["edge"] == rpip9gpio.EDGE_EVENT):
-			self.cond_sleep(gpioX_trigger)
-		self.distance(gpioX_echo)
-		self.watch(gpioX_echo)
-
-	def threadx_handler(self, gpioX_trigger, gpioX_echo):
-		DBG_WN_LN(self, "looping ... ({}: {}, bcmid:{}, {}: {}, bcmid:{}, edge: {})".format(gpioX_trigger["name"], gpioX_trigger["val"], gpioX_trigger["bcmid"], gpioX_echo["name"], gpioX_echo["val"], gpioX_echo["bcmid"], self.stredge(gpioX_echo["edge"])))
-		if (gpioX_trigger is not None) and (gpioX_echo is not None):
-			while (self.is_quit == 0):
-				if ("threading_pause" in gpioX_trigger) and (gpioX_trigger["threading_pause"] == 1):
-					self.cond_sleep(gpioX_trigger)
+	def threadx_handler(self, gpioX):
+		DBG_WN_LN(self, "looping ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
+		if (gpioX is not None):
+			if ("type" in gpioX):
+				if (gpioX["type"] == "dht22" ):
+					gpioX["dhtX"] = adafruit_dht.DHT22( gpioX["bcmid"] )
 				else:
-					self.threadx_tick(gpioX_trigger, gpioX_echo)
+					gpioX["dhtX"] = adafruit_dht.DHT11( gpioX["bcmid"] )
+			gpioX["temperature_c"] = 0
+			gpioX["temperature_f"] = gpioX["temperature_c"] * (9 / 5) + 32
+			gpioX["humidity"] = 0
+			while (self.is_quit == 0):
+				if ("threading_pause" in gpioX) and (gpioX["threading_pause"] == 1):
+					self.cond_sleep(gpioX)
+				else:
+					self.threadx_tick(gpioX)
 				#sleep(self.hold_sec)
-		DBG_WN_LN(self, "{} ({}: {}, bcmid:{}, {}: {}, bcmid:{})".format(DBG_TXT_BYE_BYE, gpioX_trigger["name"], gpioX_trigger["bcmid"], gpioX_trigger["val"], gpioX_echo["name"], gpioX_echo["val"], gpioX_echo["bcmid"]))
+		DBG_WN_LN(self, "{} (gpioX[{}/{}]: {})".format(DBG_TXT_BYE_BYE, gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 
 	def cond_wakeup(self, gpioX):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
@@ -190,6 +149,8 @@ class ultrasonic_ctx(rpip9gpio):
 				if ("threading_handler" in gpioX) and (gpioX["threading_handler"] is not None):
 					self.cond_wakeup(gpioX)
 					gpioX["threading_handler"].join()
+					if ("dhtX" in gpioX) and (gpioX["dhtX"] is not None):
+						gpioX["dhtX"].exit()
 
 			if ( self.gpioXlnk == 1 ):
 				for key, gpioX in self.gpioXlist.items():
@@ -199,16 +160,8 @@ class ultrasonic_ctx(rpip9gpio):
 				DBG_WN_LN("call GPIO.cleanup ...")
 				GPIO.cleanup()
 
-	def ctx_init(self, gpioXlist, edge_mode):
+	def ctx_init(self, gpioXlist):
 		self.gpioXlist = gpioXlist
-		self.gpioX_trigger = self.gpioXlist.get("trigger")
-		self.gpioX_echo = self.gpioXlist.get("echo")
-
-		self.shout_sec = 0.00002
-		self.echo_timeout = 5000
-		self.edge_timeout = 1000
-		self.average = 0
-		self.gpioX_echo["edge"] = edge_mode
 
 		self.hold_sec = 0.01
 
@@ -216,20 +169,20 @@ class ultrasonic_ctx(rpip9gpio):
 			#DBG_WR_LN(self, "(key: {})".format(key) )
 			if ("threading_handler" in gpioX) and (gpioX["threading_handler"] is None):
 				gpioX["threading_cond"] = threading.Condition()
-				gpioX["threading_handler"] = threading.Thread(target=self.threadx_handler, args = (gpioX, self.gpioX_echo))
+				gpioX["threading_handler"] = threading.Thread(target=self.threadx_handler, args = (gpioX, ))
 				gpioX["threading_handler"].start()
 
 		sleep(0.5)
 
-	def __init__(self, gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio.EDGE_DEFAULT, **kwargs):
+	def __init__(self, gpioXlist=dht_gpio_all, **kwargs):
 		if ( isPYTHON(PYTHON_V3) ):
 			super().__init__(**kwargs)
 		else:
-			super(ultrasonic_ctx, self).__init__(**kwargs)
+			super(dhtx_ctx, self).__init__(**kwargs)
 
 		DBG_TR_LN(self, "{}".format(DBG_TXT_ENTER))
 		self._kwargs = kwargs
-		self.ctx_init(gpioXlist, edge_mode)
+		self.ctx_init(gpioXlist)
 
 	def parse_args(self, args):
 		self._args = args
@@ -237,7 +190,7 @@ class ultrasonic_ctx(rpip9gpio):
 		DBG_TR_LN("(keyboard: {})".format( self.keyboard ));
 
 	def start(self, args={"keyboard": 0}):
-		self.linkGPIO()
+		#self.linkGPIO()
 		self.parse_args(args)
 
 		for key, gpioX in self.gpioXlist.items():
@@ -247,7 +200,3 @@ class ultrasonic_ctx(rpip9gpio):
 
 		if (self.keyboard==1):
 			self.keyboard_recv()
-
-#usonic_mgr = ultrasonic_ctx(edge_mode=ULTRASONIC_EDGE_DEFAULT)
-#usonic_mgr.startx("trigger")
-#usonic_mgr.keyboard_recv()
