@@ -34,6 +34,8 @@ Do nothing
 
 > 相關說明可見 [Adafruit_CircuitPython_DHT](https://github.com/adafruit/Adafruit_CircuitPython_DHT)
 
+![dht1101](./images/dht1101.jpg)
+
 ```mermaid
 flowchart LR
 	subgraph DHT11
