@@ -13,6 +13,12 @@ RPiP9 把 Raspberry Pi 上常見的模組搜集而成。
 - [netifaces 0.11.0](https://pypi.org/project/netifaces/)
 - [RPi.GPIO 0.7.1](https://pypi.org/project/RPi.GPIO/)
 - [pigpio 1.78](https://pypi.org/project/pigpio/)
+
+```bash
+sudo systemctl status pigpiod
+sudo service pigpiod start
+```
+
 - [libgpiod 2.0.1](https://pypi.org/project/libgpiod/)
 
 ```bash
@@ -88,7 +94,7 @@ $ make dht11_123.py
 
 ```mermaid
 flowchart LR
-	subgraph ultrasonic
+	subgraph servo
 		PWM["PWM (Orange)"]
 		VCC["VCC (Red)"]
 		GND["GND (Brown)"]
@@ -143,12 +149,12 @@ PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./servo_tilt_123.py -d 3
 
 ```mermaid
 flowchart LR
-	subgraph "ultrasonic (tilt)"
+	subgraph "servo (tilt)"
 		PWM_tilt["PWM (Orange)"]
 		VCC_tilt["VCC (Red)"]
 		GND_tilt["GND (Brown)"]
 	end
-	subgraph "ultrasonic (pan)"
+	subgraph "servo (pan)"
 		PWM_pan["PWM (Orange)"]
 		VCC_pan["VCC (Red)"]
 		GND_pan["GND (Brown)"]
