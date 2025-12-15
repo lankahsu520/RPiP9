@@ -1,31 +1,29 @@
 # 1. Overview
 
-RPiP9 把 Raspberry Pi 上常見的模組搜集而成。
-
-當然你會覺得網路上有，為什麼還寫出這些範例？
-
-網路上都是以課程為單位在教學，完全沒有思慮 busy loop、multi thread、資源交換，甚至是程式碼共用等問題。
-
-不敢說自己寫的很完美，至少會用我在業界的態度來撰寫。
+> RPiP9 把 Raspberry Pi 上常見的模組搜集而成。
+>
+> 當然你會覺得網路上有，為什麼還寫出這些範例？網路上都是以課程為單位在教學，完全沒有思慮 busy loop、multi thread、資源交換，甚至是程式碼共用等問題。
+>
+> 不敢說自己寫的很完美，至少會用我在業界的態度來撰寫。
 
 # 2. Depend on
 
-- [netifaces 0.11.0](https://pypi.org/project/netifaces/)
-- [RPi.GPIO 0.7.1](https://pypi.org/project/RPi.GPIO/)
-- [pigpio 1.78](https://pypi.org/project/pigpio/)
+#### - [netifaces 0.11.0](https://pypi.org/project/netifaces/)
+#### - [RPi.GPIO 0.7.1](https://pypi.org/project/RPi.GPIO/)
+#### - [pigpio 1.78](https://pypi.org/project/pigpio/)
 
 ```bash
 sudo systemctl status pigpiod
 sudo service pigpiod start
 ```
 
-- [libgpiod 2.0.1](https://pypi.org/project/libgpiod/)
+#### - [libgpiod 2.0.1](https://pypi.org/project/libgpiod/)
 
 ```bash
 sudo apt-get install libgpiod2
 ```
 
-- [adafruit-circuitpython-dht 4.0.2](https://pypi.org/project/adafruit-circuitpython-dht/), [Adafruit_CircuitPython_DHT](https://github.com/adafruit/Adafruit_CircuitPython_DHT)
+#### - [adafruit-circuitpython-dht 4.0.2](https://pypi.org/project/adafruit-circuitpython-dht/), [Adafruit_CircuitPython_DHT](https://github.com/adafruit/Adafruit_CircuitPython_DHT)
 
 # 3. Current Status
 
@@ -494,12 +492,8 @@ PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./ultrasonic_123.py -d 3
 [7089/-001] ultrasonic_api.py|watch:0053 - (distance: 5.973851680755615 cm)
 
 ```
-# 6. License
 
-RPiP9 is under the New BSD License (BSD-3-Clause).
-
-
-# 7. Documentation
+# 6. Documentation
 Run an example and read it.
 
 ![RaspberryPi3B01](./images/RaspberryPi3B01.jpg)
@@ -533,3 +527,13 @@ $ sudo systemctl enable pigpiod
 ```
 
 # III. Glossary
+
+# IV. Tool Usage
+
+# Author
+
+> Created and designed by [Lanka Hsu](lankahsu@gmail.com).
+
+# License
+
+> [RPiP9](https://github.com/lankahsu520/RPiP9) is under the New BSD License (BSD-3-Clause).
