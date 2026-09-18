@@ -76,7 +76,7 @@ class rpip9gpio(pythonX9):
 
 	def setGPIO(self, key, bcmid):
 		if ( self.gpioXlnk == 0 ):
-			DBG_IF_LN(self, "(key: {}, bcmid: {})".format(key, bcmid) )
+			DBG_IF_LN("(key: {}, bcmid: {})".format(key, bcmid) )
 			gpioX = self.gpioXlist.get(key)
 			if (gpioX is not None):
 				gpioX["bcmid"] = bcmid
@@ -84,12 +84,12 @@ class rpip9gpio(pythonX9):
 	def linkGPIO(self):
 		if ( self.gpioXlnk == 0 ):
 			self.gpioXlnk = 1
-			DBG_IF_LN(self, "call GPIO.setmode ... (gpioXmode: {})".format( self.strgpio(self.gpioXmode) ) )
+			DBG_IF_LN("call GPIO.setmode ... (gpioXmode: {})".format( self.strgpio(self.gpioXmode) ) )
 			GPIO.setmode(self.gpioXmode)
 			GPIO.setwarnings(False)
 
 			for key, gpioX in self.gpioXlist.items():
-				DBG_IF_LN(self, "{} (gpioX[{}/{}]: {}, direction: {})".format(self.strcontrol(gpioX["control"]), key, gpioX["bcmid"], gpioX["val"], self.strdirection(gpioX["direction"])) )
+				DBG_IF_LN("{} (gpioX[{}/{}]: {}, direction: {})".format(self.strcontrol(gpioX["control"]), key, gpioX["bcmid"], gpioX["val"], self.strdirection(gpioX["direction"])) )
 				if ( gpioX["control"] == self.CONTROL_SW ):
 					if ( gpioX["direction"] == GPIO.OUT ):
 						GPIO.setup( gpioX["bcmid"], gpioX["direction"], initial=GPIO.LOW )
@@ -99,11 +99,11 @@ class rpip9gpio(pythonX9):
 					gpioX["pwm"] = GPIO.PWM(gpioX["bcmid"], gpioX["freq"])
 					dutyCycle = gpioX["def"]/gpioX["divisor"]
 					gpioX["pwm"].start( 0 )
-					DBG_DB_LN(self, "pwmAngle (SW) (key: {}, def: {}, dutyCycle: {})".format(key, gpioX["def"], dutyCycle))
+					DBG_DB_LN("pwmAngle (SW) (key: {}, def: {}, dutyCycle: {})".format(key, gpioX["def"], dutyCycle))
 					gpioX["pwm"].ChangeDutyCycle(dutyCycle)
 				elif ( gpioX["control"] == self.CONTROL_HW ):
 					gpioX["pwm"] = pigpio.pi()
-					DBG_DB_LN(self, "pwmAngle (HW) (key: {}, def: {})".format(key, gpioX["def"]))
+					DBG_DB_LN("pwmAngle (HW) (key: {}, def: {})".format(key, gpioX["def"]))
 					gpioX["pwm"].hardware_PWM(gpioX["bcmid"], gpioX["freq"], gpioX["def"])
 				else:
 					if ( gpioX["direction"] == GPIO.OUT ):
@@ -118,7 +118,7 @@ class rpip9gpio(pythonX9):
 		gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None):
 			if ( gpioX["control"] == self.CONTROL_SW ):
-					DBG_DB_LN(self, "(key: {}, freq: {})".format(key, freq))
+					DBG_DB_LN("(key: {}, freq: {})".format(key, freq))
 					gpioX["pwm"].ChangeFrequency(freq)
 
 	def pwmPower(self, key, power):
@@ -126,7 +126,7 @@ class rpip9gpio(pythonX9):
 		gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None):
 			if ( gpioX["control"] == self.CONTROL_SW ):
-					DBG_DB_LN(self, "pwmPower (SW) (key: {}, power: {})".format(key, power))
+					DBG_DB_LN("pwmPower (SW) (key: {}, power: {})".format(key, power))
 					gpioX["pwm"].ChangeDutyCycle(power)
 
 	def pwmAngle(self, key, angle):
@@ -134,13 +134,13 @@ class rpip9gpio(pythonX9):
 		gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None):
 			if ( gpioX["control"] == self.CONTROL_SW ):
-				DBG_DB_LN(self, "pwmAngle (SW) (key: {}, angle: {})".format(key, angle))
+				DBG_DB_LN("pwmAngle (SW) (key: {}, angle: {})".format(key, angle))
 				#dutyCycle = angle / 18. + 3.
 				dutyCycle = angle/gpioX["divisor"]
 				gpioX["pwm"].ChangeDutyCycle(dutyCycle)
 			elif ( gpioX["control"] == self.CONTROL_HW ):
 				dutyCycle = angle
-				DBG_DB_LN(self, "pwmAngle (HW) (key: {}, angle: {}, dutyCycle: {})".format(key, angle, dutyCycle))
+				DBG_DB_LN("pwmAngle (HW) (key: {}, angle: {}, dutyCycle: {})".format(key, angle, dutyCycle))
 				gpioX["pwm"].hardware_PWM(gpioX["bcmid"], gpioX["freq"], dutyCycle)
 
 	def gpioGetVal(self, gpioX):
@@ -150,11 +150,11 @@ class rpip9gpio(pythonX9):
 		return GPIO.input(bcmid)
 
 	def gpioSetOutputHigh(self, gpioX, val):
-		DBG_DB_LN(self, "(key: {}, bcmid: {}, val: {})".format(gpioX["name"], gpioX["bcmid"], val) )
+		DBG_DB_LN("(key: {}, bcmid: {}, val: {})".format(gpioX["name"], gpioX["bcmid"], val) )
 		GPIO.output(gpioX["bcmid"], val)
 
 	def gpioSetOutputLow(self, gpioX, val):
-		DBG_DB_LN(self, "(key: {}, bcmid: {}, val: {})".format(gpioX["name"], gpioX["bcmid"], val) )
+		DBG_DB_LN("(key: {}, bcmid: {}, val: {})".format(gpioX["name"], gpioX["bcmid"], val) )
 		GPIO.output(gpioX["bcmid"], val)
 
 	def gpioSetHelper(self, gpioX, val):

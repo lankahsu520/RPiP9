@@ -49,7 +49,7 @@ class dhtx_ctx(rpip9gpio):
 				self.dhtx_temperature(gpioX)
 				self.dhtx_humidity(gpioX)
 			except RuntimeError as error:
-				DBG_ER_LN(self, "{}".format( error.args[0] ))
+				DBG_ER_LN("{}".format( error.args[0] ))
 
 	def dhtx_start(self, key):
 		gpioX = self.gpioXlist.get(key)
@@ -70,7 +70,7 @@ class dhtx_ctx(rpip9gpio):
 		#gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None) and ("threading_pause" in gpioX):
 			gpioX["threading_pause"] = 0
-			DBG_WN_LN(self, "run in loop ... (gpioX[{}/{}]: {})".format( gpioX["name"], gpioX["bcmid"], gpioX["val"]) )
+			DBG_WN_LN("run in loop ... (gpioX[{}/{}]: {})".format( gpioX["name"], gpioX["bcmid"], gpioX["val"]) )
 			self.cond_wakeup(gpioX)
 
 	def threadx_run_all(self):
@@ -81,11 +81,11 @@ class dhtx_ctx(rpip9gpio):
 	def threadx_tick(self, gpioX):
 		if (gpioX is not None):
 			self.dhtx_lookup(gpioX)
-			DBG_IF_LN(self, "(gpioX[{}/{}], Temperature: {:.1f} F / {:.1f} C, Humidity: {}%)".format( gpioX["name"], gpioX["bcmid"], gpioX["temperature_c"], gpioX["temperature_f"], gpioX["humidity"]) )
+			DBG_IF_LN("(gpioX[{}/{}], Temperature: {:.1f} F / {:.1f} C, Humidity: {}%)".format( gpioX["name"], gpioX["bcmid"], gpioX["temperature_c"], gpioX["temperature_f"], gpioX["humidity"]) )
 			self.cond_wait(gpioX, gpioX["delay"])
 
 	def threadx_handler(self, gpioX):
-		DBG_WN_LN(self, "looping ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
+		DBG_WN_LN("looping ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 		if (gpioX is not None):
 			if ("type" in gpioX):
 				if (gpioX["type"] == "dht22" ):
@@ -101,33 +101,33 @@ class dhtx_ctx(rpip9gpio):
 				else:
 					self.threadx_tick(gpioX)
 				#sleep(self.hold_sec)
-		DBG_WN_LN(self, "{} (gpioX[{}/{}]: {})".format(DBG_TXT_BYE_BYE, gpioX["name"], gpioX["bcmid"], gpioX["val"]))
+		DBG_WN_LN("{} (gpioX[{}/{}]: {})".format(DBG_TXT_BYE_BYE, gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 
 	def cond_wakeup(self, gpioX):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
 			gpioX["threading_cond"].acquire()
-			#DBG_IF_LN(self, "notify ...")
+			#DBG_IF_LN("notify ...")
 			gpioX["threading_cond"].notify()
 			gpioX["threading_cond"].release()
 
 	def cond_wait(self, gpioX, timeout):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
 			gpioX["threading_cond"].acquire()
-			DBG_DB_LN(self, "wait ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
+			DBG_DB_LN("wait ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 			gpioX["threading_cond"].wait(timeout)
 			gpioX["threading_cond"].release()
-			#DBG_IF_LN(self, "exit")
+			#DBG_IF_LN("exit")
 
 	def cond_sleep(self, gpioX):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
 			gpioX["threading_cond"].acquire()
-			DBG_WN_LN(self, "wait ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
+			DBG_WN_LN("wait ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 			gpioX["threading_cond"].wait()
 			gpioX["threading_cond"].release()
-			#DBG_IF_LN(self, "exit")
+			#DBG_IF_LN("exit")
 
 	def keyboard_recv(self):
-		DBG_WN_LN(self, "press q to quit the loop (enter: start, space: pause) ...")
+		DBG_WN_LN("press q to quit the loop (enter: start, space: pause) ...")
 		k='\x00'
 		while ( self.is_quit == 0 ):
 			k = self.inkey()
@@ -180,7 +180,7 @@ class dhtx_ctx(rpip9gpio):
 		else:
 			super(dhtx_ctx, self).__init__(**kwargs)
 
-		DBG_TR_LN(self, "{}".format(DBG_TXT_ENTER))
+		DBG_TR_LN("{}".format(DBG_TXT_ENTER))
 		self._kwargs = kwargs
 		self.ctx_init(gpioXlist)
 

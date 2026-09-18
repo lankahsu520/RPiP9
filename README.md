@@ -8,22 +8,24 @@
 
 # 2. Depend on
 
-#### - [netifaces 0.11.0](https://pypi.org/project/netifaces/)
-#### - [RPi.GPIO 0.7.1](https://pypi.org/project/RPi.GPIO/)
-#### - [pigpio 1.78](https://pypi.org/project/pigpio/)
+## - [netifaces 0.11.0](https://pypi.org/project/netifaces/)
+## - [RPi.GPIO 0.7.1](https://pypi.org/project/RPi.GPIO/)
+## - [pigpio 1.78](https://pypi.org/project/pigpio/)
 
 ```bash
 sudo systemctl status pigpiod
 sudo service pigpiod start
 ```
 
-#### - [libgpiod 2.0.1](https://pypi.org/project/libgpiod/)
+## - [libgpiod 2.0.1](https://pypi.org/project/libgpiod/)
 
 ```bash
 sudo apt-get install libgpiod2
 ```
 
-#### - [adafruit-circuitpython-dht 4.0.2](https://pypi.org/project/adafruit-circuitpython-dht/), [Adafruit_CircuitPython_DHT](https://github.com/adafruit/Adafruit_CircuitPython_DHT)
+## - [adafruit-circuitpython-dht 4.0.2](https://pypi.org/project/adafruit-circuitpython-dht/), [Adafruit_CircuitPython_DHT](https://github.com/adafruit/Adafruit_CircuitPython_DHT)
+
+## - [pythonX9](https://github.com/lankahsu520/pythonX9)
 
 # 3. Current Status
 
@@ -34,7 +36,7 @@ Do nothing
 ```
 # 5. Example or Usage
 
-#### - dht11_123.py : [DHT11](https://datasheetspdf.com/pdf/792210/ABCPROYECTOS/DHT11/1), Temperature Sensor example
+## - dht11_123.py : [DHT11](https://datasheetspdf.com/pdf/792210/ABCPROYECTOS/DHT11/1), Temperature Sensor example
 
 > 相關說明可見 [Adafruit_CircuitPython_DHT](https://github.com/adafruit/Adafruit_CircuitPython_DHT)
 
@@ -81,7 +83,7 @@ $ make dht11_123.py
 
 ```
 
-#### - servo_tilt_123.py : [SG90](https://datasheetspdf.com/pdf/791970/TowerPro/SG90/1) (180 degree Rotation), Micro Servo example
+## - servo_tilt_123.py : [SG90](https://datasheetspdf.com/pdf/791970/TowerPro/SG90/1) (180 degree Rotation), Micro Servo example
 
 > a frequency of 50Hz. That frequency was selected because the servo motor expect a pulse every 20ms (period), that means 50 pulses per second or Hertz.
 >
@@ -141,7 +143,7 @@ PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./servo_tilt_123.py -d 3
 
 ```
 
-#### - servo_tilt_pan_123.py : [SG90 ](https://datasheetspdf.com/pdf/791970/TowerPro/SG90/1)(180 degree Rotation)*2, Micro Servo example
+## - servo_tilt_pan_123.py : [SG90 ](https://datasheetspdf.com/pdf/791970/TowerPro/SG90/1)(180 degree Rotation)*2, Micro Servo example
 
 ![servoSG9003](./images/servoSG9003.jpg)
 
@@ -196,7 +198,7 @@ PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./servo_tilt_pan_123.py -d 3
 
 ```
 
-#### - traffic_lights_123.py : Traffic Lights example
+## - traffic_lights_123.py : Traffic Lights example
 
 > 這是一個很簡單的 GPIO.OUT 操作。
 
@@ -263,7 +265,7 @@ $ make traffic_lights_123.py
 
 ```
 
-#### - xtrack_18_123.py : Tracker Sensor (TCRT5000), Tracker Sensor example
+## - xtrack_18_123.py : Tracker Sensor (TCRT5000), Tracker Sensor example
 
 > 這是一個很簡單的 GPIO.IN 操作。
 >
@@ -327,7 +329,7 @@ PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./xtrack_18_123.py -d 3
 
 ```
 
-#### - xtrack_all_456.py : Tracker Sensor (TCRT5000)*5, Tracker Sensor example
+## - xtrack_all_456.py : Tracker Sensor (TCRT5000)*5, Tracker Sensor example
 ```mermaid
 flowchart TD
 	subgraph "r2"
@@ -435,7 +437,7 @@ PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./xtrack_all_456.py -d 3
 
 ```
 
-#### - ultrasonic_123.py : [HC-SR04](https://datasheetspdf.com/pdf/1380138/ETC1/HC-SR04/1), Ultrasonic Sensor example
+## - ultrasonic_123.py : [HC-SR04](https://datasheetspdf.com/pdf/1380138/ETC1/HC-SR04/1), Ultrasonic Sensor example
 
 > 包含了 GPIO.IN 和 GPIO.OUT 操作。
 >

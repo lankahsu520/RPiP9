@@ -33,7 +33,7 @@ class ultrasonic_ctx(rpip9gpio):
 
 	def watch(self, gpioX):
 		if (gpioX["e_time"]>0) and (gpioX["s_time"]>0):
-			DBG_IF_LN(self, "(distance: {} cm)".format( gpioX["distance"] ))
+			DBG_IF_LN("(distance: {} cm)".format( gpioX["distance"] ))
 		#print("(distance: {} cm)".format( gpioX["distance"] ) )
 
 	def distance(self, gpioX):
@@ -51,7 +51,7 @@ class ultrasonic_ctx(rpip9gpio):
 	def start_shout(self, gpioX_trigger):
 		#self.linkGPIO()
 		if (gpioX_trigger is not None):
-			DBG_TR_LN(self, "shout !!! {}".format(gpioX_trigger))
+			DBG_TR_LN("shout !!! {}".format(gpioX_trigger))
 			self.gpioSetLow(gpioX_trigger)
 			sleep(self.hold_sec)
 			self.gpioSetHigh(gpioX_trigger)
@@ -60,7 +60,7 @@ class ultrasonic_ctx(rpip9gpio):
 
 	def echo_value_tick(self, gpioX, val):
 		#self.linkGPIO()
-		#DBG_TR_LN(self, start")
+		#DBG_TR_LN(start")
 		if (gpioX is not None):
 			count_down = self.echo_timeout
 			while (self.gpioGetVal(gpioX) != val ) and (count_down > 0) and (self.is_quit == 0):
@@ -72,7 +72,7 @@ class ultrasonic_ctx(rpip9gpio):
 
 	def edge_wait(self, gpioX, val):
 		#self.linkGPIO()
-		#DBG_IF_LN(self, "start {}".format(gpioX["bcmid"]))
+		#DBG_IF_LN("start {}".format(gpioX["bcmid"]))
 		if (gpioX is not None):
 			count_down = self.edge_timeout
 			if (val == True):
@@ -86,7 +86,7 @@ class ultrasonic_ctx(rpip9gpio):
 
 	def edge_detect_cb(self, bcmid):
 		val = self.gpioGetValWithID(bcmid)
-		#DBG_IF_LN(self, "(bcmid: {}, val: {})".format(bcmid, val))
+		#DBG_IF_LN("(bcmid: {}, val: {})".format(bcmid, val))
 		for key, gpioX in self.gpioXlist.items():
 			if (gpioX["bcmid"] == bcmid ):
 				if ( val ):
@@ -109,7 +109,7 @@ class ultrasonic_ctx(rpip9gpio):
 		#gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None) and ("threading_pause" in gpioX):
 			gpioX["threading_pause"] = 0
-			DBG_WN_LN(self, "run in loop ... (gpioX[{}/{}]: {})".format( gpioX["name"], gpioX["bcmid"], gpioX["val"]) )
+			DBG_WN_LN("run in loop ... (gpioX[{}/{}]: {})".format( gpioX["name"], gpioX["bcmid"], gpioX["val"]) )
 			self.cond_wakeup(gpioX)
 
 	def threadx_run_all(self):
@@ -134,7 +134,7 @@ class ultrasonic_ctx(rpip9gpio):
 		self.watch(gpioX_echo)
 
 	def threadx_handler(self, gpioX_trigger, gpioX_echo):
-		DBG_WN_LN(self, "looping ... ({}: {}, bcmid:{}, {}: {}, bcmid:{}, edge: {})".format(gpioX_trigger["name"], gpioX_trigger["val"], gpioX_trigger["bcmid"], gpioX_echo["name"], gpioX_echo["val"], gpioX_echo["bcmid"], self.stredge(gpioX_echo["edge"])))
+		DBG_WN_LN("looping ... ({}: {}, bcmid:{}, {}: {}, bcmid:{}, edge: {})".format(gpioX_trigger["name"], gpioX_trigger["val"], gpioX_trigger["bcmid"], gpioX_echo["name"], gpioX_echo["val"], gpioX_echo["bcmid"], self.stredge(gpioX_echo["edge"])))
 		if (gpioX_trigger is not None) and (gpioX_echo is not None):
 			while (self.is_quit == 0):
 				if ("threading_pause" in gpioX_trigger) and (gpioX_trigger["threading_pause"] == 1):
@@ -142,33 +142,33 @@ class ultrasonic_ctx(rpip9gpio):
 				else:
 					self.threadx_tick(gpioX_trigger, gpioX_echo)
 				#sleep(self.hold_sec)
-		DBG_WN_LN(self, "{} ({}: {}, bcmid:{}, {}: {}, bcmid:{})".format(DBG_TXT_BYE_BYE, gpioX_trigger["name"], gpioX_trigger["bcmid"], gpioX_trigger["val"], gpioX_echo["name"], gpioX_echo["val"], gpioX_echo["bcmid"]))
+		DBG_WN_LN("{} ({}: {}, bcmid:{}, {}: {}, bcmid:{})".format(DBG_TXT_BYE_BYE, gpioX_trigger["name"], gpioX_trigger["bcmid"], gpioX_trigger["val"], gpioX_echo["name"], gpioX_echo["val"], gpioX_echo["bcmid"]))
 
 	def cond_wakeup(self, gpioX):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
 			gpioX["threading_cond"].acquire()
-			#DBG_IF_LN(self, "notify ...")
+			#DBG_IF_LN("notify ...")
 			gpioX["threading_cond"].notify()
 			gpioX["threading_cond"].release()
 
 	def cond_wait(self, gpioX, timeout):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
 			gpioX["threading_cond"].acquire()
-			DBG_DB_LN(self, "wait ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
+			DBG_DB_LN("wait ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 			gpioX["threading_cond"].wait(timeout)
 			gpioX["threading_cond"].release()
-			#DBG_IF_LN(self, "exit")
+			#DBG_IF_LN("exit")
 
 	def cond_sleep(self, gpioX):
 		if ("threading_cond" in gpioX) and (gpioX["threading_cond"] is not None):
 			gpioX["threading_cond"].acquire()
-			DBG_WN_LN(self, "wait ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
+			DBG_WN_LN("wait ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 			gpioX["threading_cond"].wait()
 			gpioX["threading_cond"].release()
-			#DBG_IF_LN(self, "exit")
+			#DBG_IF_LN("exit")
 
 	def keyboard_recv(self):
-		DBG_WN_LN(self, "press q to quit the loop (enter: start, space: pause) ...")
+		DBG_WN_LN("press q to quit the loop (enter: start, space: pause) ...")
 		k='\x00'
 		while ( self.is_quit == 0 ):
 			k = self.inkey()
@@ -227,7 +227,7 @@ class ultrasonic_ctx(rpip9gpio):
 		else:
 			super(ultrasonic_ctx, self).__init__(**kwargs)
 
-		DBG_TR_LN(self, "{}".format(DBG_TXT_ENTER))
+		DBG_TR_LN("{}".format(DBG_TXT_ENTER))
 		self._kwargs = kwargs
 		self.ctx_init(gpioXlist, edge_mode)
 
