@@ -17,24 +17,24 @@
  ***************************************************************************
 """
 
-from ultrasonic_api import *
+from RPiP9.ultrasonic_api import *
 
 app_list = []
 is_quit = 0
 app_apps = {
-	"dbg_more": DBG_LVL_INFO
+	"dbg_lvl": DBG_LVL_INFO
 	,"keyboard": 1
 }
 
 def app_start():
 	global app_apps
 
-	#DBG_ER_LN("(dbg_more: {})".format( app_apps["dbg_more"] ))
+	#DBG_ER_LN("(dbg_lvl: {})".format( app_apps["dbg_lvl"] ))
 
-	#usonic_mgr = ultrasonic_ctx(gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio.EDGE_BUSY, dbg_more=app_apps["dbg_more"])
-	#usonic_mgr = ultrasonic_ctx(gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio.EDGE_WAIT, dbg_more=app_apps["dbg_more"])
-	#usonic_mgr = ultrasonic_ctx(gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio.EDGE_EVENT, dbg_more=app_apps["dbg_more"])
-	usonic_mgr = ultrasonic_ctx(gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio.EDGE_DEFAULT, dbg_more=app_apps["dbg_more"])
+	#usonic_mgr = ultrasonic_ctx(gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio.EDGE_BUSY, dbg_lvl=app_apps["dbg_lvl"])
+	#usonic_mgr = ultrasonic_ctx(gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio.EDGE_WAIT, dbg_lvl=app_apps["dbg_lvl"])
+	#usonic_mgr = ultrasonic_ctx(gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio.EDGE_EVENT, dbg_lvl=app_apps["dbg_lvl"])
+	usonic_mgr = ultrasonic_ctx(gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio.EDGE_DEFAULT, dbg_lvl=app_apps["dbg_lvl"])
 	app_watch(usonic_mgr)
 	usonic_mgr.start( app_apps )
 
@@ -94,7 +94,7 @@ def parse_arg(argv):
 			if opt in ("-h", "--help"):
 				show_usage(argv)
 			elif opt in ("-d", "--debug"):
-				app_apps["dbg_more"] = dbg_debug_helper( int(arg) )
+				app_apps["dbg_lvl"] = dbg_debug_helper( int(arg) )
 			elif opt in ("-k", "--key"):
 				app_apps["keyboard"] = 1
 			else:

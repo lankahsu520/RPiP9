@@ -16,7 +16,7 @@
  ***************************************************************************
 """
 
-from pythonX9 import *
+from utilsP9.utilsP9 import *
 
 import RPi.GPIO as GPIO
 import pigpio # PWM HW
@@ -25,7 +25,7 @@ import pigpio # PWM HW
 
 TONES = { "DO": 262, "DO#": 277, "RE": 294, "RE#": 311, "MI": 330, "FA": 349, "FA#": 370, "SO": 392, "SO#": 415, "LA": 440, "LA#": 466, "SI": 494, "DO2": 523 }
 
-class rpip9gpio(pythonX9):
+class rpip9gpio(utilsP9):
 
 	#GPIO_MODE=GPIO.BOARD
 	GPIO_MODE=GPIO.BCM

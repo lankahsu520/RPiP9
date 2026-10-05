@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "RPiP9"
+version = "1.0.0"
+description = "RPiP9 把 Raspberry Pi 上常見的模組搜集而成。"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "utilsP9 @ git+https://github.com/lankahsu520/utilsP9.git",
+]
+
+[tool.setuptools]
+py-modules = [
+    "rpip9gpio",
+    "dhtx_api",
+    "servo_api",
+    "traffic_lights_api",
+    "ultrasonic_api",
+    "xtrack_api",
+]

@@ -13,8 +13,35 @@
 ## - [pigpio 1.78](https://pypi.org/project/pigpio/)
 
 ```bash
-sudo systemctl status pigpiod
-sudo service pigpiod start
+$ sudo apt --yes install pigpio # PWM HW
+$ sudo apt --yes install python3-pigpio
+
+$ cd /tmp
+$ git clone https://github.com/joan2937/pigpio.git
+$ cd pigpio
+$ make
+$ sudo make install
+$ sudo nano /etc/systemd/system/pigpiod.service
+[Unit]
+Description=pigpio daemon
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/pigpiod
+ExecStop=/bin/killall pigpiod
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+$ sudo systemctl daemon-reload
+$ sudo systemctl enable pigpiod
+$ sudo systemctl status pigpiod
+# 如果沒有啟動
+$ sudo service pigpiod start
 ```
 
 ## - [libgpiod 2.0.1](https://pypi.org/project/libgpiod/)
@@ -25,7 +52,11 @@ sudo apt-get install libgpiod2
 
 ## - [adafruit-circuitpython-dht 4.0.2](https://pypi.org/project/adafruit-circuitpython-dht/), [Adafruit_CircuitPython_DHT](https://github.com/adafruit/Adafruit_CircuitPython_DHT)
 
-## - [pythonX9](https://github.com/lankahsu520/pythonX9)
+## - [utilsP9](https://github.com/lankahsu520/utilsP9)
+
+```bash
+$ pip install git+https://github.com/lankahsu520/utilsP9.git
+```
 
 # 3. Current Status
 
@@ -61,7 +92,7 @@ flowchart LR
 ```
 
 ```bash
-$ make dht11_123.py
+$ make dht11_123
 ----->> layer_python - /work/codebase/lankahsu520/RPiP9/python
 
 
@@ -117,7 +148,7 @@ flowchart LR
 |             |                                                              |      |                           |                            |      |
 
 ```bash
-$ make servo_tilt_123.py
+$ make servo_tilt_123
 ----->> layer_python - /work/codebase/lankahsu520/RPiP9/python
 
 
@@ -173,7 +204,7 @@ flowchart LR
 > This is just an illustration to avoid overly complex graphics. Please correctly connect VCC and GND.
 
 ```bash
-$ make servo_tilt_pan_123.py
+$ make servo_tilt_pan_123
 ----->> layer_python - /work/codebase/lankahsu520/RPiP9/python
 
 
@@ -224,7 +255,7 @@ flowchart LR
 ```
 
 ```bash
-$ make traffic_lights_123.py
+$ make traffic_lights_123
 ----->> layer_python - /work/codebase/lankahsu520/RPiP9/python
 
 
@@ -300,7 +331,7 @@ flowchart LR
 ```
 
 ```bash
-$ make xtrack_18_123.py
+$ make xtrack_18_123
 ----->> layer_python - /work/codebase/lankahsu520/RPiP9/python
 
 
@@ -382,7 +413,7 @@ flowchart TD
 > This is just an illustration to avoid overly complex graphics. Please correctly connect VCC and GND.
 
 ```bash
-$ make xtrack_all_456.py
+$ make xtrack_all_456
 ----->> layer_python - /work/codebase/lankahsu520/RPiP9/python
 
 
@@ -466,7 +497,7 @@ flowchart LR
 ```
 
 ```bash
- $ make ultrasonic_123.py
+ $ make ultrasonic_123
 ----->> layer_python - /work/codebase/lankahsu520/RPiP9/python
 
 
@@ -526,6 +557,13 @@ $ sudo netstat -tulpn | grep pigpiod
 $ sudo service pigpiod start
 $ sudo systemctl status pigpiod
 $ sudo systemctl enable pigpiod
+```
+
+## II.2. RuntimeError: Failed to add edge detection
+
+```bash
+$ sudo apt remove python3-rpi.gpio
+$ pip3 install rpi-lgpio
 ```
 
 # III. Glossary

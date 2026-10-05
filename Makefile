@@ -1,6 +1,8 @@
 PWD=$(shell pwd)
 -include $(SDK_CONFIG_CONFIG)
 
+MY_NAME = RPiP9
+
 #** include *.mk **
 -include define.mk
 
@@ -15,21 +17,24 @@ LIBNAME_MOD =
 
 #** GITHUB_LIBS **
 GITHUB_LIBS = \
-							https://github.com/lankahsu520/pythonX9.git
+#														https://github.com/lankahsu520/utilsP9.git
 
 #** PYTHON_FILES **
 PYTHON_FILES = \
-							dht11_123.py \
-							traffic_lights_123.py \
-							xtrack_all_456.py \
-							xtrack_18_123.py \
-							servo_tilt_pan_123.py \
-							servo_tilt_123.py \
-							ultrasonic_123.py \
+							dht11_123 \
+							traffic_lights_123 \
+							xtrack_all_456 \
+							xtrack_18_123 \
+							servo_tilt_pan_123 \
+							servo_tilt_123 \
+							ultrasonic_123 \
 
 DEBUG=3
 DEBUG_ARG=-d $(DEBUG)
 #SUDO_EX=sudo -E
+
+export PJ_PYTHON_VER=$(shell python -c 'import sys; print("{0[0]}.{0[1]}".format(sys.version_info))')
+export MAKE_DBG='==\> python $(PJ_PYTHON_VER) -'
 
 #********************************************************************************
 #** All **
@@ -41,25 +46,29 @@ DEBUG_ARG=-d $(DEBUG)
 all: $(PYTHON_FILES)
 
 clean:
-	$(PJ_SH_RM) export.log
+	$(PJ_SH_RM) export.log .layer_python
 	$(PJ_SH_RM) .configured
-	$(PJ_SH_RMDIR) __pycache__/ ./python/ github_libs/
-	$(PJ_SH_RM) $(PJ_NAME)/version.txt
+	$(PJ_SH_RMDIR) __pycache__/ $(MY_NAME)/__pycache__/ log/ ./python/ github_libs/
+	$(PJ_SH_RM) $(MY_NAME)/version.txt
 	@for subdir in $(CONFS_yes); do \
 		[ -d "$$subdir" ] && (make -C $$subdir $@;) || echo "skip !!! ($$subdir)"; \
 	done
 
 distclean: clean
 
-layer_python:
-	@echo '----->> $@ - $(PWD)/python'
-	@if [ ! -d "$(PWD)/python" ]; then \
-		(pip3 install --target $(PWD)/python -r requirements.txt); \
-		[ -d "$(PWD)/python" ] && (for libs in $(GITHUB_LIBS); do (git clone $$libs github_libs && $(PJ_SH_CP) github_libs/*.py $(PWD)/python && rm -rf github_libs); done) || echo "Fail to create !!! ($(PWD)/python)"; \
-	fi
+.layer_python:
+	#@echo '$(MAKE_DBG) $@: $(PWD)/python'
+	#@if [ ! -d "$(PWD)/python" ]; then \
+	#	(pip3 install --upgrade --force-reinstall --target $(PWD)/python -r $(MY_NAME)/requirements.txt); \
+	#	for libs in $(GITHUB_LIBS); do (git clone $$libs github_libs && $(PJ_SH_CP) github_libs/*.py $(PWD)/python && rm -rf github_libs); done \
+	#fi
+	@echo '----->> $@ - pip install -r $(MY_NAME)/requirements.txt'
+	(pip install -r $(MY_NAME)/requirements.txt)
 	@echo
+	touch $@
 
-$(PYTHON_FILES): layer_python
+$(PYTHON_FILES): .layer_python
 	@echo
-	@echo '----->> run $@'
-	[ -d "$(PWD)/python" ] && $(SUDO_EX) PYTHONPATH=$(PWD)/python ./$@ $(DEBUG_ARG)
+	@echo '$(MAKE_DBG) run: $@'
+	#[ -d "$(PWD)/python" ] && $(SUDO_EX) PYTHONPATH=$(PWD)/python ./$@ $(DEBUG_ARG)
+	$(SUDO_EX) ./$@.py $(DEBUG_ARG)

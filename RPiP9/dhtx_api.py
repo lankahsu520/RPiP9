@@ -16,54 +16,42 @@
  ***************************************************************************
 """
 
-from rpip9gpio import *
+from .rpip9gpio import *
 #from threadx_api import *
 import threading
 #from _thread import start_new_thread
 
-BCM_R=17#0
-BCM_Y=27#2
-BCM_G=22#3
-lightR = {"name": "R", "bcmid": BCM_R, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.OUT, "val": GPIO.LOW, "delay": 3, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
-lightY = {"name": "Y", "bcmid": BCM_Y, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.OUT, "val": GPIO.LOW, "delay": 1}
-lightG = {"name": "G", "bcmid": BCM_G, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.OUT, "val": GPIO.LOW, "delay": 5}
+import board
+import adafruit_dht
 
-traffic_lights_gpio_all= {"R": lightR, "Y": lightY, "G": lightG }
+DHT_BOARD4=board.D4
+DHT_BOARD18=board.D18
 
-class traffic_lights_ctx(rpip9gpio):
+dht11 = {"name": "dht11", "type": "dht11", "bcmid": DHT_BOARD4, "dhtX": None, "val": GPIO.LOW, "delay": 3, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
+dht22 = {"name": "dht22", "type": "dht22", "bcmid": DHT_BOARD18, "dhtX": None, "val": GPIO.LOW, "delay": 3, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
 
-	def lightX_helper(self, gpioX, val):
+dht_gpio_all = {"dht11": dht11}
+
+class dhtx_ctx(rpip9gpio):
+
+	def dhtx_temperature(self, gpioX):
+		if (gpioX is not None) and (gpioX["dhtX"] is not None):
+			gpioX["temperature_c"] = gpioX["dhtX"].temperature
+			gpioX["temperature_f"] = gpioX["temperature_c"] * (9 / 5) + 32
+
+	def dhtx_humidity(self, gpioX):
 		if (gpioX is not None):
-			self.gpioSetHelper(gpioX, val)
-			DBG_IF_LN("(gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
+			gpioX["humidity"] = gpioX["dhtX"].humidity
 
-	def lightX_on(self, gpioX):
+	def dhtx_lookup(self, gpioX):
 		if (gpioX is not None):
-			self.lightX_helper(gpioX, 1)
+			try:
+				self.dhtx_temperature(gpioX)
+				self.dhtx_humidity(gpioX)
+			except RuntimeError as error:
+				DBG_ER_LN("{}".format( error.args[0] ))
 
-	def lightX_off(self, gpioX):
-		if (gpioX is not None):
-			self.lightX_helper(gpioX, 0)
-
-	def light_on(self, key):
-		gpioX = self.gpioXlist.get(key)
-		if (gpioX is not None):
-			self.lightX_helper(gpioX, 1)
-
-	def light_off(self, key):
-		gpioX = self.gpioXlist.get(key)
-		if (gpioX is not None):
-			self.lightX_helper(gpioX, 0)
-
-	def light_all_on(self):
-		for key, gpioX in self.gpioXlist.items():
-			self.lightX_helper(gpioX, 1)
-
-	def light_all_off(self):
-		for key, gpioX in self.gpioXlist.items():
-			self.lightX_helper(gpioX, 0)
-
-	def traffic_light_start(self, key):
+	def dhtx_start(self, key):
 		gpioX = self.gpioXlist.get(key)
 		if (gpioX is not None):
 			self.threadx_run_loop(gpioX)
@@ -91,38 +79,22 @@ class traffic_lights_ctx(rpip9gpio):
 				self.threadx_run_loop(gpioX)
 
 	def threadx_tick(self, gpioX):
-		self.lightX_on(self.gpioX_r)
-		#sleep(self.gpioX_r["delay"])
-		self.cond_wait(gpioX, self.gpioX_r["delay"])
-		if ( self.is_quit == 1 ):
-			return 1
-
-		self.lightX_off(self.gpioX_r)
-		self.lightX_on(self.gpioX_y)
-		#sleep(self.gpioX_y["delay"])
-		self.cond_wait(gpioX, self.gpioX_y["delay"])
-		if ( self.is_quit == 1 ):
-			return 1
-
-		self.lightX_off(self.gpioX_y)
-		self.lightX_on(self.gpioX_g)
-		#sleep(self.gpioX_g["delay"])
-		self.cond_wait(gpioX, self.gpioX_g["delay"])
-		if ( self.is_quit == 1 ):
-			return 1
-
-		self.lightX_off(self.gpioX_g)
-		self.lightX_on(self.gpioX_y)
-		#sleep(self.gpioX_y["delay"])
-		self.cond_wait(gpioX, self.gpioX_y["delay"])
-
-		self.lightX_off(self.gpioX_y)
-		if ( self.is_quit == 1 ):
-			return 1
+		if (gpioX is not None):
+			self.dhtx_lookup(gpioX)
+			DBG_IF_LN("(gpioX[{}/{}], Temperature: {:.1f} F / {:.1f} C, Humidity: {}%)".format( gpioX["name"], gpioX["bcmid"], gpioX["temperature_c"], gpioX["temperature_f"], gpioX["humidity"]) )
+			self.cond_wait(gpioX, gpioX["delay"])
 
 	def threadx_handler(self, gpioX):
 		DBG_WN_LN("looping ... (gpioX[{}/{}]: {})".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 		if (gpioX is not None):
+			if ("type" in gpioX):
+				if (gpioX["type"] == "dht22" ):
+					gpioX["dhtX"] = adafruit_dht.DHT22( gpioX["bcmid"] )
+				else:
+					gpioX["dhtX"] = adafruit_dht.DHT11( gpioX["bcmid"] )
+			gpioX["temperature_c"] = 0
+			gpioX["temperature_f"] = gpioX["temperature_c"] * (9 / 5) + 32
+			gpioX["humidity"] = 0
 			while (self.is_quit == 0):
 				if ("threading_pause" in gpioX) and (gpioX["threading_pause"] == 1):
 					self.cond_sleep(gpioX)
@@ -155,23 +127,13 @@ class traffic_lights_ctx(rpip9gpio):
 			#DBG_IF_LN("exit")
 
 	def keyboard_recv(self):
-		DBG_WN_LN("press q to quit the loop (enter: start, space: pause, a: all on, r: Red on, y: Yellow on, g: Green on) ...")
+		DBG_WN_LN("press q to quit the loop (enter: start, space: pause) ...")
 		k='\x00'
 		while ( self.is_quit == 0 ):
 			k = self.inkey()
 			self.threadx_pause_all()
-			self.light_all_off()
-			#DBG_WN_LN(">>>>>>>> {}".format(k))
 			if k=='\x71': # q
 				break;
-			elif k=='\x61': # a
-				self.light_all_on()
-			elif k=='\x72': # r
-				self.light_on("R")
-			elif k=='\x79': # y
-				self.light_on("Y")
-			elif k=='\x67': # g
-				self.light_on("G")
 			elif k=='\x0d': # enter
 				self.threadx_run_all()
 			elif k=='\x20': # space
@@ -187,6 +149,8 @@ class traffic_lights_ctx(rpip9gpio):
 				if ("threading_handler" in gpioX) and (gpioX["threading_handler"] is not None):
 					self.cond_wakeup(gpioX)
 					gpioX["threading_handler"].join()
+					if ("dhtX" in gpioX) and (gpioX["dhtX"] is not None):
+						gpioX["dhtX"].exit()
 
 			if ( self.gpioXlnk == 1 ):
 				for key, gpioX in self.gpioXlist.items():
@@ -198,9 +162,6 @@ class traffic_lights_ctx(rpip9gpio):
 
 	def ctx_init(self, gpioXlist):
 		self.gpioXlist = gpioXlist
-		self.gpioX_r = self.gpioXlist.get("R")
-		self.gpioX_y = self.gpioXlist.get("Y")
-		self.gpioX_g = self.gpioXlist.get("G")
 
 		self.hold_sec = 0.01
 
@@ -213,11 +174,11 @@ class traffic_lights_ctx(rpip9gpio):
 
 		sleep(0.5)
 
-	def __init__(self, gpioXlist=traffic_lights_gpio_all, **kwargs):
+	def __init__(self, gpioXlist=dht_gpio_all, **kwargs):
 		if ( isPYTHON(PYTHON_V3) ):
 			super().__init__(**kwargs)
 		else:
-			super(traffic_lights_ctx, self).__init__(**kwargs)
+			super(dhtx_ctx, self).__init__(**kwargs)
 
 		DBG_TR_LN("{}".format(DBG_TXT_ENTER))
 		self._kwargs = kwargs
@@ -229,7 +190,7 @@ class traffic_lights_ctx(rpip9gpio):
 		DBG_TR_LN("(keyboard: {})".format( self.keyboard ));
 
 	def start(self, args={"keyboard": 0}):
-		self.linkGPIO()
+		#self.linkGPIO()
 		self.parse_args(args)
 
 		for key, gpioX in self.gpioXlist.items():

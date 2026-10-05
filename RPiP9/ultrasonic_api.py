@@ -16,7 +16,7 @@
  ***************************************************************************
 """
 
-from rpip9gpio import *
+from .rpip9gpio import *
 #from threadx_api import *
 import threading
 #from _thread import start_new_thread
@@ -243,6 +243,10 @@ class ultrasonic_ctx(rpip9gpio):
 		for key, gpioX in self.gpioXlist.items():
 			if  ("direction" in gpioX) and (gpioX["direction"] ==  GPIO.IN) and ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio.EDGE_EVENT):
 				DBG_IF_LN("call add_event_detect .. (gpioX[{}/{}]: {}).".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
+				try:
+					GPIO.remove_event_detect(gpioX["bcmid"])
+				except:
+					pass
 				GPIO.add_event_detect(gpioX["bcmid"], GPIO.BOTH, callback=self.edge_detect_cb)
 
 		if (self.keyboard==1):

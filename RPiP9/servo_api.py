@@ -16,7 +16,7 @@
  ***************************************************************************
 """
 
-from rpip9gpio import *
+from .rpip9gpio import *
 #from threadx_api import *
 import threading
 #from _thread import start_new_thread
