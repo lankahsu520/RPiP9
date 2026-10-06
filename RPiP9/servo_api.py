@@ -16,7 +16,7 @@
  ***************************************************************************
 """
 
-from .rpip9gpio import *
+from .rpip9gpio_api import *
 #from threadx_api import *
 import threading
 #from _thread import start_new_thread
@@ -24,25 +24,25 @@ import threading
 BCM_TILT=12#32
 BCM_PAN=13#33
 
-sw_tilt_330 = {"name": "tilt", "bcmid": BCM_TILT, "control": rpip9gpio.CONTROL_SW, "direction": GPIO.OUT, "val": 50, "def": 50, "freq": 330, "pwm": None, "max": 100, "min": 0, "step": 1, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 1}
-sw_pan_330 = {"name": "pan", "bcmid": BCM_PAN, "control": rpip9gpio.CONTROL_SW, "direction": GPIO.OUT, "val": 50, "def": 50, "freq": 330, "pwm": None, "max": 100, "min": 0, "step": 1, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 1}
+sw_tilt_330 = {"name": "tilt", "bcmid": BCM_TILT, "control": rpip9gpio_ctx.CONTROL_SW, "direction": GPIO.OUT, "val": 50, "def": 50, "freq": 330, "pwm": None, "max": 100, "min": 0, "step": 1, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 1}
+sw_pan_330 = {"name": "pan", "bcmid": BCM_PAN, "control": rpip9gpio_ctx.CONTROL_SW, "direction": GPIO.OUT, "val": 50, "def": 50, "freq": 330, "pwm": None, "max": 100, "min": 0, "step": 1, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 1}
 
 servo_sw_tilt_330 = {"tilt": sw_tilt_330}
 servo_sw_tilt_pan_330 = {"tilt": sw_tilt_330, "pan": sw_pan_330}
 
-sw_tilt_50 = {"name": "tilt", "bcmid": BCM_TILT, "control": rpip9gpio.CONTROL_SW, "direction": GPIO.OUT, "val": 750, "def": 750, "freq": 50, "pwm": None, "max": 1250, "min": 250, "step": 10, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 100}
-sw_pan_50 = {"name": "pan", "bcmid": BCM_PAN, "control": rpip9gpio.CONTROL_SW, "direction": GPIO.OUT, "val": 750, "def": 750, "freq": 50, "pwm": None, "max": 1250, "min": 250, "step": 10, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 100}
+sw_tilt_50 = {"name": "tilt", "bcmid": BCM_TILT, "control": rpip9gpio_ctx.CONTROL_SW, "direction": GPIO.OUT, "val": 750, "def": 750, "freq": 50, "pwm": None, "max": 1250, "min": 250, "step": 10, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 100}
+sw_pan_50 = {"name": "pan", "bcmid": BCM_PAN, "control": rpip9gpio_ctx.CONTROL_SW, "direction": GPIO.OUT, "val": 750, "def": 750, "freq": 50, "pwm": None, "max": 1250, "min": 250, "step": 10, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 100}
 
 servo_sw_tilt_50 = {"tilt": sw_tilt_50}
 servo_sw_tilt_pan_50 = {"tilt": sw_tilt_50, "pan": sw_pan_50}
 
-hw_tilt = {"name": "tilt", "bcmid": BCM_TILT, "control": rpip9gpio.CONTROL_HW, "direction": GPIO.OUT, "val": 72500, "def": 72500, "freq": 50, "pwm": None, "max": 120000, "min": 25000, "step": 950, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 1}
-hw_pan = {"name": "pan", "bcmid": BCM_PAN, "control": rpip9gpio.CONTROL_HW, "direction": GPIO.OUT, "val": 72500, "def": 72500, "freq": 50, "pwm": None, "max": 120000, "min": 25000, "step": 950, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 1}
+hw_tilt = {"name": "tilt", "bcmid": BCM_TILT, "control": rpip9gpio_ctx.CONTROL_HW, "direction": GPIO.OUT, "val": 72500, "def": 72500, "freq": 50, "pwm": None, "max": 120000, "min": 25000, "step": 950, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 1}
+hw_pan = {"name": "pan", "bcmid": BCM_PAN, "control": rpip9gpio_ctx.CONTROL_HW, "direction": GPIO.OUT, "val": 72500, "def": 72500, "freq": 50, "pwm": None, "max": 120000, "min": 25000, "step": 950, "threading_pause": 1, "threading_handler": None, "threading_cond": None, "divisor": 1}
 
 servo_hw_tilt_and_pan = {"tilt": hw_tilt, "pan": hw_pan}
 servo_hw_tilt = {"tilt": hw_tilt}
 
-class servo_ctx(rpip9gpio):
+class servo_ctx(rpip9gpio_ctx):
 
 	def servo_angle_helper(self, key, angle):
 		gpioX = self.gpioXlist.get(key)
@@ -240,7 +240,7 @@ class servo_ctx(rpip9gpio):
 		self.parse_args(args)
 
 		for key, gpioX in self.gpioXlist.items():
-			if  ("direction" in gpioX) and (gpioX["direction"] ==  GPIO.IN) and ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio.EDGE_EVENT):
+			if  ("direction" in gpioX) and (gpioX["direction"] ==  GPIO.IN) and ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio_ctx.EDGE_EVENT):
 				DBG_IF_LN("call add_event_detect .. (gpioX[{}/{}]: {}).".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 				GPIO.add_event_detect(gpioX["bcmid"], GPIO.BOTH, callback=self.edge_detect_cb)
 

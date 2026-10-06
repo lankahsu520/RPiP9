@@ -16,7 +16,7 @@
  ***************************************************************************
 """
 
-from .rpip9gpio import *
+from .rpip9gpio_api import *
 #from threadx_api import *
 import threading
 #from _thread import start_new_thread
@@ -32,7 +32,7 @@ dht22 = {"name": "dht22", "type": "dht22", "bcmid": DHT_BOARD18, "dhtX": None, "
 
 dht_gpio_all = {"dht11": dht11}
 
-class dhtx_ctx(rpip9gpio):
+class dhtx_ctx(rpip9gpio_ctx):
 
 	def dhtx_temperature(self, gpioX):
 		if (gpioX is not None) and (gpioX["dhtX"] is not None):
@@ -154,7 +154,7 @@ class dhtx_ctx(rpip9gpio):
 
 			if ( self.gpioXlnk == 1 ):
 				for key, gpioX in self.gpioXlist.items():
-					if ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio.EDGE_EVENT):
+					if ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio_ctx.EDGE_EVENT):
 						GPIO.remove_event_detect(gpioX["bcmid"])
 
 				DBG_WN_LN("call GPIO.cleanup ...")
@@ -194,7 +194,7 @@ class dhtx_ctx(rpip9gpio):
 		self.parse_args(args)
 
 		for key, gpioX in self.gpioXlist.items():
-			if  ("direction" in gpioX) and (gpioX["direction"] ==  GPIO.IN) and ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio.EDGE_EVENT):
+			if  ("direction" in gpioX) and (gpioX["direction"] ==  GPIO.IN) and ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio_ctx.EDGE_EVENT):
 				DBG_IF_LN("call add_event_detect .. (gpioX[{}/{}]: {}).".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 				GPIO.add_event_detect(gpioX["bcmid"], GPIO.BOTH, callback=self.edge_detect_cb)
 

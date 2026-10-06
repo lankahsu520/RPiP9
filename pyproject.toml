@@ -14,7 +14,7 @@ dependencies = [
 
 [tool.setuptools]
 py-modules = [
-    "rpip9gpio",
+    "rpip9gpio_api",
     "dhtx_api",
     "servo_api",
     "traffic_lights_api",

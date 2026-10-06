@@ -31,10 +31,10 @@ def app_start():
 
 	#DBG_ER_LN("(dbg_lvl: {})".format( app_apps["dbg_lvl"] ))
 
-	#usonic_mgr = ultrasonic_ctx(gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio.EDGE_BUSY, dbg_lvl=app_apps["dbg_lvl"])
-	#usonic_mgr = ultrasonic_ctx(gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio.EDGE_WAIT, dbg_lvl=app_apps["dbg_lvl"])
-	#usonic_mgr = ultrasonic_ctx(gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio.EDGE_EVENT, dbg_lvl=app_apps["dbg_lvl"])
-	usonic_mgr = ultrasonic_ctx(gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio.EDGE_DEFAULT, dbg_lvl=app_apps["dbg_lvl"])
+	#usonic_mgr = ultrasonic_ctx(gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio_ctx.EDGE_BUSY, dbg_lvl=app_apps["dbg_lvl"])
+	#usonic_mgr = ultrasonic_ctx(gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio_ctx.EDGE_WAIT, dbg_lvl=app_apps["dbg_lvl"])
+	#usonic_mgr = ultrasonic_ctx(gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio_ctx.EDGE_EVENT, dbg_lvl=app_apps["dbg_lvl"])
+	usonic_mgr = ultrasonic_ctx(gpioXlist=ultrasonic_gpio, edge_mode=rpip9gpio_ctx.EDGE_DEFAULT, dbg_lvl=app_apps["dbg_lvl"])
 	app_watch(usonic_mgr)
 	usonic_mgr.start( app_apps )
 

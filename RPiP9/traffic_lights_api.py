@@ -16,7 +16,7 @@
  ***************************************************************************
 """
 
-from .rpip9gpio import *
+from .rpip9gpio_api import *
 #from threadx_api import *
 import threading
 #from _thread import start_new_thread
@@ -24,13 +24,13 @@ import threading
 BCM_R=17#0
 BCM_Y=27#2
 BCM_G=22#3
-lightR = {"name": "R", "bcmid": BCM_R, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.OUT, "val": GPIO.LOW, "delay": 3, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
-lightY = {"name": "Y", "bcmid": BCM_Y, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.OUT, "val": GPIO.LOW, "delay": 1}
-lightG = {"name": "G", "bcmid": BCM_G, "control": rpip9gpio.CONTROL_NORMAL, "direction": GPIO.OUT, "val": GPIO.LOW, "delay": 5}
+lightR = {"name": "R", "bcmid": BCM_R, "control": rpip9gpio_ctx.CONTROL_NORMAL, "direction": GPIO.OUT, "val": GPIO.LOW, "delay": 3, "threading_pause": 1, "threading_handler": None, "threading_cond": None}
+lightY = {"name": "Y", "bcmid": BCM_Y, "control": rpip9gpio_ctx.CONTROL_NORMAL, "direction": GPIO.OUT, "val": GPIO.LOW, "delay": 1}
+lightG = {"name": "G", "bcmid": BCM_G, "control": rpip9gpio_ctx.CONTROL_NORMAL, "direction": GPIO.OUT, "val": GPIO.LOW, "delay": 5}
 
 traffic_lights_gpio_all= {"R": lightR, "Y": lightY, "G": lightG }
 
-class traffic_lights_ctx(rpip9gpio):
+class traffic_lights_ctx(rpip9gpio_ctx):
 
 	def lightX_helper(self, gpioX, val):
 		if (gpioX is not None):
@@ -190,7 +190,7 @@ class traffic_lights_ctx(rpip9gpio):
 
 			if ( self.gpioXlnk == 1 ):
 				for key, gpioX in self.gpioXlist.items():
-					if ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio.EDGE_EVENT):
+					if ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio_ctx.EDGE_EVENT):
 						GPIO.remove_event_detect(gpioX["bcmid"])
 
 				DBG_WN_LN("call GPIO.cleanup ...")
@@ -233,7 +233,7 @@ class traffic_lights_ctx(rpip9gpio):
 		self.parse_args(args)
 
 		for key, gpioX in self.gpioXlist.items():
-			if  ("direction" in gpioX) and (gpioX["direction"] ==  GPIO.IN) and ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio.EDGE_EVENT):
+			if  ("direction" in gpioX) and (gpioX["direction"] ==  GPIO.IN) and ("edge" in gpioX) and (gpioX["edge"] == rpip9gpio_ctx.EDGE_EVENT):
 				DBG_IF_LN("call add_event_detect .. (gpioX[{}/{}]: {}).".format(gpioX["name"], gpioX["bcmid"], gpioX["val"]))
 				GPIO.add_event_detect(gpioX["bcmid"], GPIO.BOTH, callback=self.edge_detect_cb)
 
