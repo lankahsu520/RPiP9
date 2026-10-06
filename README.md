@@ -527,7 +527,18 @@ PYTHONPATH=/work/codebase/lankahsu520/RPiP9/python ./ultrasonic_123.py -d 3
 ```
 
 # 6. Documentation
-Run an example and read it.
+> 以下是相關的繼承關係圖
+
+```mermaid
+flowchart LR
+	object --> utilsP9_ctx
+		utilsP9_ctx --> rpip9gpio_ctx
+			rpip9gpio_ctx --> dhtx_ctx
+			rpip9gpio_ctx --> servo_ctx
+			rpip9gpio_ctx --> traffic_lights_ctx
+			rpip9gpio_ctx --> ultrasonic_ctx
+			rpip9gpio_ctx --> xtrack_ctx
+```
 
 ![RaspberryPi3B01](./images/RaspberryPi3B01.jpg)
 
